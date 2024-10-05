@@ -1,36 +1,12 @@
 ---
 layout: ../layouts/AboutLayout.astro
-title: "About"
+title: "Sobre mi"
 ---
 
-AstroPaper is a minimal, responsive and SEO-friendly Astro blog theme. I designed and crafted this based on [my personal blog](https://satnaing.dev/blog).
+# ¡Hola, mundo! 🌍
 
-This theme is aimed to be accessible out of the box. Light and dark mode are supported by
-default and additional color schemes can also be configured.
+Soy un **Ingeniero de Software** con más de 5 años de experiencia, ¡y soy un apasionado de la tecnología! Desde crear aplicaciones web y móviles que ayudan a las empresas a despegar, hasta experimentar con nuevas herramientas, ¡mi vida gira en torno a las TIC!
 
-This theme is self-documented \_ which means articles/posts in this theme can also be considered as documentations. So, see the documentation for more info.
+Soy un experto en **JavaScript**, **React**, **Angular**, **NestJS** y **Docker**. Cuando no estoy codificando, me encontrarás organizando meetups y eventos para compartir conocimientos con otros entusiastas de la tecnología. Estoy siempre aprendiendo sobre **arquitectura de software** y **cloud computing**, porque en este mundo de la tecnología, ¡nunca hay un momento aburrido!
 
-<div>
-  <img src="/assets/dev.svg" class="sm:w-1/2 mx-auto" alt="coding dev illustration">
-</div>
-
-## Tech Stack
-
-This theme is written in vanilla JavaScript (+ TypeScript for type checking) and a little bit of ReactJS for some interactions. TailwindCSS is used for styling; and Markdown is used for blog contents.
-
-## Features
-
-Here are certain features of this site.
-
-- fully responsive and accessible
-- SEO-friendly
-- light & dark mode
-- fuzzy search
-- super fast performance
-- draft posts
-- pagination
-- sitemap & rss feed
-- highly customizable
-
-If you like this theme, you can star/contribute to the [repo](https://github.com/satnaing/astro-paper).  
-Or you can even give any feedback via my [email](mailto:contact@satnaing.dev).
+Si necesitas una **aplicación móvil**, una **aplicación web** o un **sitio web**, ¡no dudes en contactarme! Estoy listo para hacer magia con el código. ✨
