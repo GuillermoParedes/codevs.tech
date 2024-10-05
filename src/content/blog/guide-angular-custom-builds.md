@@ -1,7 +1,7 @@
 ---
 title: Guía Completa Cómo Hacer Builds Personalizados en Angular para Diferentes Instancias (Logos y Estilos)
 author: Codevs
-pubDatetime: 2024-10-30T03:42:51Z
+pubDatetime: 2024-09-30T03:42:51Z
 slug: guide-angular-custom-builds
 featured: false
 tags:
