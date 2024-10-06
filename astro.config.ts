@@ -48,7 +48,4 @@ export default defineConfig({
   experimental: {
     contentLayer: true,
   },
-
-  output: "server",
-  adapter: vercel(),
 });
