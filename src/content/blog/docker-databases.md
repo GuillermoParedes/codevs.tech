@@ -1,7 +1,7 @@
 ---
 title: Docker Compose para Bases de Datos y Herramientas de Administración
 author: Codevs
-pubDatetime: 2024-10-09T03:42:51Z
+pubDatetime: 2024-10-09T18:17:51Z
 slug: docker-databases
 featured: false
 tags:
