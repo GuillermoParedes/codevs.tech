@@ -219,9 +219,10 @@ Después (editado manualmente):
 ALTER TABLE `User` ADD COLUMN `name` VARCHAR(100);
 ```
 
-Nota: En algunos casos, puede ser necesario realizar ediciones manuales al archivo migration.sql. Esto suele aplicarse cuando necesitamos insertar datos específicos que son esenciales para la configuración inicial del sistema o para mantener la consistencia durante el desarrollo. Por ejemplo, la inserción de registros en tablas relacionadas con catálogos, países o ciudades, que son fundamentales desde el inicio del sistema o en etapas intermedias de desarrollo.
+> Nota: En algunos casos, puede ser necesario realizar ediciones manuales al archivo migration.sql. Esto suele aplicarse cuando necesitamos insertar datos específicos que son esenciales para la configuración inicial del sistema o para mantener la consistencia durante el desarrollo. Por ejemplo, la inserción de registros en tablas relacionadas con catálogos, países o ciudades, que son fundamentales desde el inicio del sistema o en etapas intermedias de desarrollo.
 
 Es importante tener en cuenta que, si bien Prisma gestiona automáticamente las migraciones, las ediciones manuales pueden ser útiles para personalizar scripts que, por motivos del negocio o requisitos del cliente, no pueden ser generados automáticamente. Cuando se edita el migration.sql manualmente, es esencial hacerlo con cuidado, asegurando que las modificaciones sean compatibles con el esquema y la integridad de la base de datos.
+
 
 ## 6. Hacer rollback de una migración específica
 
