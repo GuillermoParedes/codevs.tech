@@ -1,7 +1,7 @@
 ---
 title: Dominando Prisma, Creación de Bases de Datos y Migraciones Eficientes
 author: Codevs
-pubDatetime: 2024-10-22T03:42:51Z
+pubDatetime: 2024-10-22T21:30:51Z
 slug: prisma-workflow
 featured: false
 tags:
