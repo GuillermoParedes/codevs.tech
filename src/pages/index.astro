@@ -1,4 +1,4 @@
----
+lear---
 import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
@@ -42,9 +42,27 @@ const socialCount = SOCIALS.filter(social => social.active).length;
       </a>
 
       <p>
-        Bienvenidos a mi espacio donde exploramos el apasionante mundo de la ingeniería de software. Aquí encontrarás artículos y tutoriales sobre JavaScript, Angular, Node.js, TypeScript, y NestJS, además de análisis sobre plataformas en la nube como Digital Ocean y mucho más. Compartiré soluciones, mejores prácticas y novedades tecnológicas para desarrolladores, abarcando desde el backend hasta el frontend. Ya sea que estés comenzando o buscando optimizar tus habilidades, este blog es el lugar para crecer juntos en el desarrollo de software moderno
+        Bienvenidos a mi espacio donde exploramos el apasionante mundo de la
+        ingeniería de software. Aquí encontrarás artículos y tutoriales sobre
+        JavaScript, Angular, Node.js, TypeScript, y NestJS, además de análisis
+        sobre plataformas en la nube como Digital Ocean y mucho más. Compartiré
+        soluciones, mejores prácticas y novedades tecnológicas para
+        desarrolladores, abarcando desde el backend hasta el frontend. Ya sea
+        que estés comenzando o buscando optimizar tus habilidades, este blog es
+        el lugar para crecer juntos en el desarrollo de software moderno.
       </p>
-      
+      <p class="text-sm text-gray-800">
+        Puedes descargar mi CV realizando 
+        <a
+          href="/cv-guillermo_paredes_torrez.pdf"
+          class="ml-1 inline-flex items-center text-blue-600 hover:underline"
+          target="_blank"
+          rel="noopener"
+        >
+        click acá
+        </a>, si estás interesado en algún proyecto juntos.
+      </p>
+
       {
         // only display if at least one social link is enabled
         socialCount > 0 && (
