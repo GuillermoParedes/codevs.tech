@@ -110,15 +110,29 @@ const structuredData = {
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Press Start 2P viaja en la MISMA petición que IBM Plex Mono: dos
+         familias en un solo `css2?family=…&family=…` no cuestan un RTT extra.
+         Sólo se usa para el chrome del gabinete (ver `.pixel` en base.css). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Press+Start+2P&display=swap"
       rel="preload"
       as="style"
       onload="this.onload=null; this.rel='stylesheet';"
       crossorigin
     />
 
-    <meta name="theme-color" content="" />
+    <!-- El color de barra es el del plástico del gabinete, no el de la
+         pantalla: es lo que toca el borde del viewport. -->
+    <meta
+      name="theme-color"
+      content="#cac7bf"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#06080c"
+      media="(prefers-color-scheme: dark)"
+    />
 
     {
       // If PUBLIC_GOOGLE_SITE_VERIFICATION is set in the environment variable,
@@ -137,6 +151,9 @@ const structuredData = {
     <script is:inline src="/toggle-theme.js" async></script>
   </head>
   <body>
+    <!-- Marco del gabinete + vidrio del tubo. Un único elemento fijo, sin
+         wrappers alrededor del contenido: ver la nota en base.css. -->
+    <div class="crt-glass" aria-hidden="true"></div>
     <slot />
   </body>
 </html>

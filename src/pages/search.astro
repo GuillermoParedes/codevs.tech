@@ -7,23 +7,31 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import SearchBar from "@components/Search";
 import getSortedPosts from "@utils/getSortedPosts";
+import { getLevelMap, getLevelMeta } from "@utils/arcade";
 
 // Retrieve all published articles
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 const sortedPosts = getSortedPosts(posts);
 
+const levelMap = getLevelMap(sortedPosts);
+
 // List of items to search in
-const searchList = sortedPosts.map(({ data, slug }) => ({
-  title: data.title,
-  description: data.description,
-  data,
-  slug,
+const searchList = sortedPosts.map(post => ({
+  title: post.data.title,
+  description: post.data.description,
+  data: post.data,
+  slug: post.slug,
+  level: getLevelMeta(post, levelMap),
 }));
 ---
 
-<Layout title={`Search | ${SITE.title}`}>
+<Layout title={`Busqueda | ${SITE.title}`}>
   <Header activeNav="search" />
-  <Main pageTitle="Busqueda" pageDesc="Busca algun articulo ...">
+  <Main
+    eyebrow="Password screen"
+    pageTitle="Buscar nivel"
+    pageDesc="Escribe el nombre o el tema del nivel que buscas."
+  >
     <SearchBar client:load searchList={searchList} />
   </Main>
   <Footer />

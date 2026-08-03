@@ -1,19 +1,26 @@
 ---
+import { getCollection } from "astro:content";
 import { LOGO_IMAGE, SITE } from "@config";
-import Hr from "./Hr.astro";
 import LinkButton from "./LinkButton.astro";
+import getSortedPosts from "@utils/getSortedPosts";
 
 export interface Props {
   activeNav?: "posts" | "tags" | "about" | "search";
 }
 
 const { activeNav } = Astro.props;
+
+// El marcador de la marquesina cuenta niveles publicados, no artículos en
+// borrador: es el mismo filtro que usa el resto del sitio.
+const levelCount = getSortedPosts(await getCollection("blog")).length;
 ---
 
 <header>
   <a id="skip-to-content" href="#main-content">Skip to content</a>
-  <div class="nav-container">
-    <div class="top-nav-wrap">
+
+  <!-- ===== Marquesina ===== -->
+  <div class="marquee">
+    <div class="marquee-inner">
       <a href="/" class="logo whitespace-nowrap">
         {
           LOGO_IMAGE.enable ? (
@@ -24,139 +31,205 @@ const { activeNav } = Astro.props;
               height={LOGO_IMAGE.height}
             />
           ) : (
-            SITE.title
+            <span class="brand neon">{SITE.title.toLowerCase()}</span>
           )
         }
       </a>
-      <nav id="nav-menu">
-        <button
-          class="hamburger-menu focus-outline"
-          aria-label="Open Menu"
-          aria-expanded="false"
-          aria-controls="menu-items"
+
+      <p class="scoreboard" aria-hidden="true">
+        <span class="score-item"
+          ><span class="score-label">1up</span> <span class="blink">&#9679;</span></span
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="menu-icon"
-          >
-            <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
-            <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
-            <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
-            <line x1="18" y1="6" x2="6" y2="18" class="close"></line>
-            <line x1="6" y1="6" x2="18" y2="18" class="close"></line>
-          </svg>
-        </button>
-        <ul id="menu-items" class="display-none sm:flex">
-          <li>
-            <a href="/posts/" class={activeNav === "posts" ? "active" : ""}>
-              Articulos
-            </a>
-          </li>
-          <li>
-            <a href="/tags/" class={activeNav === "tags" ? "active" : ""}>
-              Etiquetas
-            </a>
-          </li>
-          <li>
-            <a href="/about/" class={activeNav === "about" ? "active" : ""}>
-              Sobre mi
-            </a>
-          </li>
-          <li>
-            <LinkButton
-              href="/search/"
-              className={`focus-outline p-3 sm:p-1 ${
-                activeNav === "search" ? "active" : ""
-              } flex`}
-              ariaLabel="search"
-              title="Search"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="scale-125 sm:scale-100"
-                ><path
-                  d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z"
-                ></path>
-              </svg>
-              <span class="sr-only">Search</span>
-            </LinkButton>
-          </li>
-          {
-            SITE.lightAndDarkMode && (
-              <li>
-                <button
-                  id="theme-btn"
-                  class="focus-outline"
-                  title="Toggles light & dark"
-                  aria-label="auto"
-                  aria-live="polite"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg">
-                    <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" />
-                  </svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg">
-                    <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" />
-                  </svg>
-                </button>
-              </li>
-            )
-          }
-        </ul>
-      </nav>
+        <span class="score-item"
+          ><span class="score-label">levels</span>
+          {String(levelCount).padStart(3, "0")}</span
+        >
+        <span class="score-item hidden sm:inline"
+          ><span class="score-label">credit</span> 01</span
+        >
+      </p>
+
+      <button
+        class="hamburger-menu focus-outline"
+        aria-label="Open Menu"
+        aria-expanded="false"
+        aria-controls="menu-items"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="menu-icon"
+        >
+          <line x1="7" y1="12" x2="21" y2="12" class="line"></line>
+          <line x1="3" y1="6" x2="21" y2="6" class="line"></line>
+          <line x1="12" y1="18" x2="21" y2="18" class="line"></line>
+          <polyline points="9 8 5 12 9 16" class="code"></polyline>
+          <line x1="14" y1="7" x2="10" y2="17" class="code"></line>
+          <polyline points="15 8 19 12 15 16" class="code"></polyline>
+        </svg>
+      </button>
     </div>
   </div>
-  <Hr />
+
+  <!-- ===== Menú de la cabina ===== -->
+  <nav id="nav-menu" aria-label="Principal">
+    <ul id="menu-items" class="display-none sm:flex">
+      <li class="nav-item">
+        <a
+          href="/posts/"
+          class:list={["nav-link", activeNav === "posts" && "active"]}
+        >
+          Articulos
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="/tags/"
+          class:list={["nav-link", activeNav === "tags" && "active"]}
+        >
+          Etiquetas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="/about/"
+          class:list={["nav-link", activeNav === "about" && "active"]}
+        >
+          Sobre mi
+        </a>
+      </li>
+      <li>
+        <LinkButton
+          href="/search/"
+          className={`focus-outline p-3 sm:p-1 ${
+            activeNav === "search" ? "active" : ""
+          } flex`}
+          ariaLabel="search"
+          title="Search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="scale-125 sm:scale-100"
+            ><path
+              d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z"
+            ></path>
+          </svg>
+          <span class="sr-only">Search</span>
+        </LinkButton>
+      </li>
+      {
+        SITE.lightAndDarkMode && (
+          <li>
+            <button
+              id="theme-btn"
+              class="focus-outline"
+              title="Toggles light & dark"
+              aria-label="auto"
+              aria-live="polite"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg">
+                <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" />
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg">
+                <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" />
+              </svg>
+            </button>
+          </li>
+        )
+      }
+    </ul>
+  </nav>
 </header>
 
 <style>
   #skip-to-content {
     @apply absolute -top-full left-16 z-50 bg-skin-accent px-3 py-2 text-skin-inverted transition-all focus:top-4;
   }
-  .nav-container {
-    @apply mx-auto flex max-w-3xl flex-col items-center justify-between sm:flex-row;
+
+  /* ===== Marquesina =====
+     La franja iluminada de arriba del gabinete: fondo más oscuro que la
+     pantalla, línea de acento abajo y el logo encendido en neón. */
+  .marquee {
+    @apply border-b-2 border-skin-accent/40 bg-skin-card/50;
   }
-  .top-nav-wrap {
-    @apply relative flex w-full items-start justify-between p-4 sm:items-center sm:py-8;
+  .marquee-inner {
+    @apply mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:py-4;
   }
   .logo {
-    @apply absolute py-1 text-xl font-semibold sm:static sm:text-2xl;
+    @apply py-1 text-xl font-semibold sm:text-2xl;
   }
-  .hamburger-menu {
-    @apply self-end p-2 sm:hidden;
+  /* Los corchetes van en CSS y no en el markup: así no dependen del
+     espaciado que prettier reintroduce, y el nombre accesible del enlace
+     sigue siendo "codevs" y no "< codevs />". */
+  .brand {
+    @apply font-display tracking-tight;
   }
-  .hamburger-menu svg {
-    @apply h-6 w-6 scale-125 fill-skin-base;
+  .brand::before {
+    content: "<";
+  }
+  .brand::after {
+    content: "/>";
   }
 
+  .scoreboard {
+    @apply ml-auto flex items-center gap-3 text-[0.5rem] sm:gap-5 sm:text-[0.6rem];
+    font-family: "Press Start 2P", "IBM Plex Mono", monospace;
+    @apply uppercase leading-none;
+  }
+  .score-item {
+    @apply whitespace-nowrap text-skin-accent2;
+  }
+  .score-label {
+    @apply text-skin-base opacity-40;
+  }
+
+  .hamburger-menu {
+    @apply -mr-2 flex-none p-2 sm:hidden;
+  }
+  .hamburger-menu svg {
+    @apply h-6 w-6 scale-125 fill-transparent text-skin-base transition-transform duration-200 ease-out;
+  }
+  .hamburger-menu:hover svg {
+    @apply text-skin-accent;
+  }
+
+  /* ===== Menú ===== */
   nav {
-    @apply flex w-full flex-col items-center sm:ml-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0;
+    @apply border-b-2 border-skin-line;
   }
   nav ul {
-    @apply mt-4 grid w-44 grid-cols-2 grid-rows-4 gap-x-2 gap-y-2 sm:ml-0 sm:mt-0 sm:w-auto sm:gap-x-5 sm:gap-y-0;
+    @apply mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 sm:justify-end sm:gap-x-5;
   }
   nav ul li {
-    @apply col-span-2 flex items-center justify-center;
+    @apply flex items-center;
   }
-  nav ul li a {
-    @apply w-full px-4 py-3 text-center font-medium hover:text-skin-accent sm:my-0 sm:px-2 sm:py-1;
+  /* En móvil cada enlace ocupa su propia fila, como una lista de opciones;
+     el buscador y el tema se quedan juntos al final. */
+  nav ul li.nav-item {
+    @apply w-full sm:w-auto;
   }
-  nav ul li:nth-last-child(2) a {
-    @apply w-auto;
+  nav ul li a.nav-link {
+    @apply block w-full px-1 py-3 text-left text-[0.6rem] hover:text-skin-accent sm:w-auto sm:py-1 sm:text-center;
+    font-family: "Press Start 2P", "IBM Plex Mono", monospace;
+    @apply uppercase leading-none;
   }
-  nav ul li:nth-last-child(1),
-  nav ul li:nth-last-child(2) {
-    @apply col-span-1;
+  /* El marcador "▶" es el cursor de un menú de arcade: aparece al pasar por
+     encima y se queda fijo en la sección activa. */
+  nav ul li a.nav-link::before {
+    content: "\25B6";
+    @apply mr-2 text-skin-accent opacity-0 transition-opacity;
+  }
+  nav ul li a.nav-link:hover::before,
+  nav ul li a.nav-link.active::before {
+    @apply opacity-100;
   }
   nav a.active {
-    @apply underline decoration-wavy decoration-2 underline-offset-4;
+    @apply text-skin-accent;
   }
   nav a.active svg {
     @apply fill-skin-accent;
@@ -175,17 +248,32 @@ const { activeNav } = Astro.props;
     @apply scale-125 hover:rotate-12 sm:scale-100;
   }
 
-  .menu-icon line {
-    @apply transition-opacity duration-75 ease-in-out;
+  /* ≡ → </>  */
+  .menu-icon line,
+  .menu-icon polyline {
+    @apply transition-opacity duration-150 ease-in-out;
   }
-  .menu-icon .close {
+  .menu-icon .code {
     opacity: 0;
   }
   .menu-icon.is-active .line {
     @apply opacity-0;
   }
-  .menu-icon.is-active .close {
+  .menu-icon.is-active .code {
     @apply opacity-100;
+  }
+  .menu-icon.is-active {
+    @apply rotate-180 text-skin-accent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-icon,
+    .menu-icon line,
+    .menu-icon polyline {
+      @apply transition-none;
+    }
+    .menu-icon.is-active {
+      @apply rotate-0;
+    }
   }
 </style>
 

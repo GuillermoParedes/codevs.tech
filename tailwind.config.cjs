@@ -23,6 +23,8 @@ module.exports = {
         skin: {
           base: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
+          accent2: withOpacity("--color-accent-2"),
+          neon: withOpacity("--color-neon"),
           inverted: withOpacity("--color-fill"),
         },
       },
@@ -30,9 +32,12 @@ module.exports = {
         skin: {
           fill: withOpacity("--color-fill"),
           accent: withOpacity("--color-accent"),
+          accent2: withOpacity("--color-accent-2"),
+          neon: withOpacity("--color-neon"),
           inverted: withOpacity("--color-text-base"),
           card: withOpacity("--color-card"),
           "card-muted": withOpacity("--color-card-muted"),
+          cab: withOpacity("--color-cab"),
         },
       },
       outlineColor: {
@@ -45,17 +50,25 @@ module.exports = {
           line: withOpacity("--color-border"),
           fill: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
+          accent2: withOpacity("--color-accent-2"),
+          neon: withOpacity("--color-neon"),
+          cab: withOpacity("--color-cab-line"),
         },
       },
       fill: {
         skin: {
           base: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
+          accent2: withOpacity("--color-accent-2"),
+          neon: withOpacity("--color-neon"),
         },
         transparent: "transparent",
       },
       fontFamily: {
         mono: ["IBM Plex Mono", "monospace"],
+        display: ["IBM Plex Mono", "monospace"],
+        // Sólo para el chrome de la máquina. Ver la nota en `.pixel`.
+        pixel: ["Press Start 2P", "IBM Plex Mono", "monospace"],
       },
 
       typography: {

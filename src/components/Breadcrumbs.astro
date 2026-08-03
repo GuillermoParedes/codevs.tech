@@ -24,11 +24,11 @@ breadcrumbList[0] === "tags" &&
   );
 ---
 
-<nav class="breadcrumb" aria-label="breadcrumb">
+<nav class="breadcrumb pixel" aria-label="breadcrumb">
   <ul>
     <li>
       <a href="/">Home</a>
-      <span aria-hidden="true">&raquo;</span>
+      <span aria-hidden="true">&rsaquo;</span>
     </li>
     {
       breadcrumbList.map((breadcrumb, index) =>
@@ -45,7 +45,7 @@ breadcrumbList[0] === "tags" &&
         ) : (
           <li>
             <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
-            <span aria-hidden="true">&raquo;</span>
+            <span aria-hidden="true">&rsaquo;</span>
           </li>
         )
       )
@@ -55,16 +55,19 @@ breadcrumbList[0] === "tags" &&
 
 <style>
   .breadcrumb {
-    @apply mx-auto mb-1 mt-8 w-full max-w-3xl px-4;
+    @apply mx-auto mb-2 mt-8 w-full max-w-3xl px-4 text-[0.5rem] leading-loose;
   }
   .breadcrumb ul li {
     @apply inline;
   }
   .breadcrumb ul li a {
-    @apply capitalize opacity-70;
+    @apply opacity-50 hover:text-skin-accent hover:opacity-100;
   }
   .breadcrumb ul li span {
-    @apply opacity-70;
+    @apply opacity-50;
+  }
+  .breadcrumb ul li span[aria-current="page"] {
+    @apply text-skin-accent opacity-100;
   }
   .breadcrumb ul li:not(:last-child) a {
     @apply hover:opacity-100;

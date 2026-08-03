@@ -1,6 +1,5 @@
 ---
 import type { Page } from "astro";
-import LinkButton from "./LinkButton.astro";
 import type { CollectionEntry } from "astro:content";
 
 export interface Props {
@@ -12,48 +11,43 @@ const { page } = Astro.props;
 
 {
   page.lastPage > 1 && (
-    <nav class="pagination-wrapper" aria-label="Pagination">
-      <LinkButton
-        disabled={!page.url.prev}
-        href={page.url.prev as string}
-        className={`mr-4 select-none ${page.url.prev ? "" : "disabled"}`}
-        ariaLabel="Previous"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class:list={[{ "disabled-svg": !page.url.prev }]}
-        >
-          <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z" />
-        </svg>
-        Prev
-      </LinkButton>
-      {page.currentPage} / {page.lastPage}
-      <LinkButton
-        disabled={!page.url.next}
-        href={page.url.next as string}
-        className={`mx-4 select-none ${page.url.next ? "" : "disabled"}`}
-        ariaLabel="Next"
-      >
-        Next
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class:list={[{ "disabled-svg": !page.url.next }]}
-        >
-          <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z" />
-        </svg>
-      </LinkButton>
+    <nav class="pagination-wrapper" aria-label="Paginacion">
+      {page.url.prev ? (
+        <a href={page.url.prev} class="arcade-btn arcade-btn-b" rel="prev">
+          &#9664; Prev
+        </a>
+      ) : (
+        <span class="arcade-btn arcade-btn-b is-disabled" aria-hidden="true">
+          &#9664; Prev
+        </span>
+      )}
+
+      <span class="pixel page-count">
+        Stage {String(page.currentPage).padStart(2, "0")} /{" "}
+        {String(page.lastPage).padStart(2, "0")}
+      </span>
+
+      {page.url.next ? (
+        <a href={page.url.next} class="arcade-btn arcade-btn-b" rel="next">
+          Next &#9654;
+        </a>
+      ) : (
+        <span class="arcade-btn arcade-btn-b is-disabled" aria-hidden="true">
+          Next &#9654;
+        </span>
+      )}
     </nav>
   )
 }
 
 <style>
   .pagination-wrapper {
-    @apply mb-8 mt-auto flex justify-center;
+    @apply mx-auto mb-10 mt-auto flex max-w-3xl items-center justify-center gap-4 px-4 pt-8;
   }
-  .disabled {
-    @apply pointer-events-none select-none opacity-50 hover:text-skin-base group-hover:fill-skin-base;
+  .page-count {
+    @apply whitespace-nowrap text-[0.55rem] leading-none opacity-60;
   }
-  .disabled-svg {
-    @apply group-hover:!fill-skin-base;
+  .is-disabled {
+    @apply pointer-events-none opacity-30;
   }
 </style>

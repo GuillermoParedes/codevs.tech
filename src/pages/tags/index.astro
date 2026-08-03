@@ -4,21 +4,74 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import Tag from "@components/Tag.astro";
 import getUniqueTags from "@utils/getUniqueTags";
+import getPostsByTag from "@utils/getPostsByTag";
 import { SITE } from "@config";
 
 const posts = await getCollection("blog");
 
-let tags = getUniqueTags(posts);
+// Cada etiqueta es un "mundo": se muestra con cuántos niveles cuenta, que es
+// la información que de verdad ayuda a decidir por dónde entrar.
+const worlds = getUniqueTags(posts).map(({ tag, tagName }) => ({
+  tag,
+  tagName,
+  count: getPostsByTag(posts, tag).length,
+}));
 ---
 
-<Layout title={`Tags | ${SITE.title}`}>
+<Layout title={`Etiquetas | ${SITE.title}`}>
   <Header activeNav="tags" />
-  <Main pageTitle="Tags" pageDesc="All the tags used in posts.">
-    <ul>
-      {tags.map(({ tag }) => <Tag {tag} size="lg" />)}
+  <Main
+    eyebrow="World select"
+    pageTitle="Mundos"
+    pageDesc="Cada etiqueta es un mundo. Elige por dónde quieres entrar."
+  >
+    <ul class="world-grid">
+      {
+        worlds.map(({ tag, tagName, count }) => (
+          <li>
+            <a href={`/tags/${tag}/`} class="world-tile focus-outline">
+              <span class="pixel world-count">
+                {String(count).padStart(2, "0")}
+                {count === 1 ? " nivel" : " niveles"}
+              </span>
+              <span class="world-name" transition:name={tag}>
+                {tagName}
+              </span>
+              <span class="pixel world-go" aria-hidden="true">
+                Enter &#9654;
+              </span>
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </Main>
   <Footer />
 </Layout>
+
+<style>
+  .world-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+  }
+  .world-tile {
+    @apply flex h-full flex-col gap-2 border-2 border-skin-line bg-skin-card/40 p-4 transition-colors hover:border-skin-accent;
+    box-shadow: inset 0 0 0 2px rgb(var(--color-fill));
+  }
+  .world-count {
+    @apply text-[0.55rem] leading-none text-skin-accent2;
+  }
+  .world-name {
+    @apply font-display text-lg font-bold uppercase leading-tight tracking-tight;
+  }
+  .world-tile:hover .world-name {
+    @apply text-skin-accent;
+  }
+  .world-go {
+    @apply mt-auto pt-2 text-[0.5rem] leading-none text-skin-accent opacity-0 transition-opacity;
+  }
+  .world-tile:hover .world-go,
+  .world-tile:focus-visible .world-go {
+    @apply opacity-100;
+  }
+</style>

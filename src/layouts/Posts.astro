@@ -1,10 +1,12 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
-import Card from "@components/Card";
+import ArcadeSelector from "@components/ArcadeSelector";
+import { getLevelMap, toSelectorItem } from "@utils/arcade";
 import { SITE } from "@config";
 import type { Page } from "astro";
 import type { CollectionEntry } from "astro:content";
@@ -14,18 +16,21 @@ export interface Props {
 }
 
 const { page } = Astro.props;
+
+// El mapa de niveles se calcula sobre la colección COMPLETA, no sobre la
+// página: si no, el nivel 01 cambiaría en cada página del paginado.
+const levelMap = getLevelMap(await getCollection("blog"));
+const items = page.data.map(post => toSelectorItem(post, levelMap));
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
+<Layout title={`Articulos | ${SITE.title}`}>
   <Header activeNav="posts" />
-  <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    <ul>
-      {
-        page.data.map(({ data, slug }) => (
-          <Card href={`/posts/${slug}/`} frontmatter={data} />
-        ))
-      }
-    </ul>
+  <Main
+    eyebrow={`Stage select · pagina ${page.currentPage} de ${page.lastPage}`}
+    pageTitle="All levels"
+    pageDesc="Todos los articulos publicados. Mueve la palanca para elegir."
+  >
+    <ArcadeSelector client:visible items={items} heading="Select your level" />
   </Main>
 
   <Pagination {page} />

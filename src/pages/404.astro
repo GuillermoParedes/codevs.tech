@@ -3,23 +3,28 @@ import { SITE } from "@config";
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
 ---
 
 <Layout title={`404 Not Found | ${SITE.title}`}>
   <Header />
 
   <main id="main-content">
-    <div class="not-found-wrapper">
-      <h1>404</h1>
-      <span aria-hidden="true">¯\_(ツ)_/¯</span>
-      <p>Page Not Found</p>
-      <LinkButton
-        href="/"
-        className="my-6 text-lg underline decoration-dashed underline-offset-8"
-      >
-        Go back home
-      </LinkButton>
+    <div class="game-over">
+      <p class="pixel game-over-code">Error 404</p>
+      <h1 class="display">Game<br />over</h1>
+      <p class="game-over-lede">
+        Esa pantalla no existe. Puede que el nivel se haya movido o que la URL
+        tenga una errata.
+      </p>
+
+      <p class="pixel continue" aria-hidden="true">
+        Continue? <span id="continue-count" class="text-skin-accent2">9</span>
+      </p>
+
+      <div class="game-over-actions">
+        <a href="/" class="arcade-btn arcade-btn-a">&#9654; Continue</a>
+        <a href="/posts/" class="arcade-btn arcade-btn-b">Ver niveles</a>
+      </div>
     </div>
   </main>
 
@@ -28,15 +33,52 @@ import LinkButton from "@components/LinkButton.astro";
 
 <style>
   #main-content {
-    @apply mx-auto flex max-w-3xl flex-1 items-center justify-center;
+    @apply mx-auto flex w-full max-w-3xl flex-1 items-center justify-center px-4;
   }
-  .not-found-wrapper {
-    @apply mb-14 flex flex-col items-center justify-center;
+  .game-over {
+    @apply flex flex-col items-center py-16 text-center;
   }
-  .not-found-wrapper h1 {
-    @apply text-9xl font-bold text-skin-accent;
+  .game-over-code {
+    @apply mb-4 text-[0.6rem] leading-none opacity-50;
   }
-  .not-found-wrapper p {
-    @apply mt-4 text-2xl sm:text-3xl;
+  .game-over h1 {
+    @apply text-6xl text-skin-accent2 sm:text-8xl;
+  }
+  .game-over-lede {
+    @apply mt-6 max-w-md text-sm opacity-70;
+  }
+  .continue {
+    @apply mt-8 text-[0.7rem] leading-none;
+  }
+  .game-over-actions {
+    @apply mt-6 flex flex-wrap items-center justify-center gap-3;
   }
 </style>
+
+<script>
+  /* La cuenta atrás es decorativa: llega a 0 y se queda ahí. No redirige
+     sola a propósito — un salto automático rompería el botón "atrás" y
+     movería la página bajo los pies de quien esté leyendo el mensaje. */
+  function startContinueCountdown() {
+    const output = document.getElementById("continue-count");
+    if (!output) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) {
+      output.textContent = "0";
+      return;
+    }
+
+    let remaining = 9;
+    output.textContent = String(remaining);
+
+    const timer = window.setInterval(() => {
+      remaining -= 1;
+      output.textContent = String(remaining);
+      if (remaining <= 0) window.clearInterval(timer);
+    }, 1000);
+  }
+
+  startContinueCountdown();
+  document.addEventListener("astro:after-swap", startContinueCountdown);
+</script>

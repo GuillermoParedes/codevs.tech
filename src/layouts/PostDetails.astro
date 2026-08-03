@@ -2,11 +2,16 @@
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
+import {
+  difficultyStars,
+  formatLevel,
+  getLevelMap,
+  getLevelMeta,
+} from "@utils/arcade";
 import { SITE } from "@config";
 
 export interface Props {
@@ -46,186 +51,221 @@ const layoutProps = {
   scrollSmooth: true,
 };
 
-/* ========== Prev/Next Posts ========== */
+/* ========== Nivel ========== */
 
-const allPosts = posts.map(({ data: { title }, slug }) => ({
-  slug,
-  title,
-}));
+const levelMap = getLevelMap(posts);
+const meta = getLevelMeta(post, levelMap);
 
-const currentPostIndex = allPosts.findIndex(a => a.slug === post.slug);
-
-const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
-const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+/* Anterior/siguiente van por número de nivel, no por fecha de modificación:
+   si el HUD dice "LEVEL 03", "NEXT LEVEL" tiene que ser el 04. */
+const chronological = [...posts].sort(
+  (a, b) =>
+    new Date(a.data.pubDatetime).getTime() -
+    new Date(b.data.pubDatetime).getTime()
+);
+const currentIndex = chronological.findIndex(entry => entry.slug === post.slug);
+const prevLevel = currentIndex > 0 ? chronological[currentIndex - 1] : null;
+const nextLevel =
+  currentIndex > -1 && currentIndex < chronological.length - 1
+    ? chronological[currentIndex + 1]
+    : null;
 ---
 
 <Layout {...layoutProps}>
   <Header />
 
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
-    <button
-      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>Regresar</span>
-    </button>
+  <!-- ===== HUD del nivel =====
+       Se queda pegado arriba mientras se lee: es el marcador de la partida,
+       y la barra de vida es el progreso de lectura. -->
+  <div class="level-hud sticky-under-frame">
+    <div class="mx-auto max-w-3xl px-4">
+      <div class="hud !border-t-0">
+        <a href="/posts/" class="exit-link">&#9664; Exit</a>
+        <span>
+          <span class="hud-label">Level</span>
+          <span class="text-skin-accent">{meta.label}</span>
+        </span>
+        <span class="hidden sm:inline">
+          <span class="hud-label">World</span>
+          {meta.world}
+        </span>
+        <span class="text-skin-accent2" title={`Dificultad ${meta.difficulty} de 5`}>
+          {difficultyStars(meta.difficulty)}
+        </span>
+        <span class="ml-auto">
+          <span class="hud-label">Time</span>
+          {meta.minutes} min
+        </span>
+      </div>
+      <div class="life-bar border-t-0" aria-hidden="true">
+        <div class="life-bar-fill" id="level-bar-fill"></div>
+      </div>
+    </div>
   </div>
+
   <main id="main-content">
+    <p class="pixel stage-tag">
+      Stage {meta.label} &mdash; {meta.world}
+    </p>
+
     <h1 transition:name={slugifyStr(title)} class="post-title">{title}</h1>
     <Datetime
       pubDatetime={pubDatetime}
       modDatetime={modDatetime}
       size="lg"
-      className="my-2"
+      className="my-3"
     />
+
     <article id="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
 
-    <ul class="my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-    </ul>
+    <!-- ===== Power-ups (etiquetas) ===== -->
+    <section class="power-ups" aria-label="Etiquetas">
+      <h2 class="pixel power-ups-title">Power-ups</h2>
+      <ul>
+        {
+          tags.map(tag => (
+            <li>
+              <a href={`/tags/${slugifyStr(tag)}/`} class="power-up">
+                {tag}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
 
-    <div
-      class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-    >
-      <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
-            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-          ></path>
-        </svg>
-        <span>Regresar arriba</span>
-      </button>
+    <!-- ===== Fin de nivel ===== -->
+    <section class="arcade-panel level-complete" aria-label="Fin del articulo">
+      <p class="pixel level-complete-title neon">Level complete</p>
+      <p class="level-complete-lede">
+        ¿Te sirvió? Compártelo y sigue con el siguiente nivel.
+      </p>
+      <div class="level-complete-actions">
+        <ShareLinks />
+        <button id="back-to-top" class="arcade-btn arcade-btn-b" type="button">
+          &#9650; Volver arriba
+        </button>
+      </div>
+    </section>
 
-      <ShareLinks />
-    </div>
-
-    <hr class="my-6 border-dashed" />
-
-    <!-- Previous/Next Post Buttons -->
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <!-- ===== Navegación entre niveles ===== -->
+    <nav class="level-nav" aria-label="Niveles adyacentes">
       {
-        prevPost && (
-          <a
-            href={`/posts/${prevPost.slug}`}
-            class="flex w-full gap-1 hover:opacity-75"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left flex-none"
-            >
-              <>
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M15 6l-6 6l6 6" />
-              </>
-            </svg>
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-skin-accent/85">{prevPost.title}</div>
-            </div>
+        prevLevel && (
+          <a href={`/posts/${prevLevel.slug}/`} class="level-nav-card">
+            <span class="pixel level-nav-label">
+              &#9664; Prev level {formatLevel(levelMap.get(prevLevel.slug) ?? 1)}
+            </span>
+            <span class="level-nav-title">{prevLevel.data.title}</span>
           </a>
         )
       }
       {
-        nextPost && (
+        nextLevel && (
           <a
-            href={`/posts/${nextPost.slug}`}
-            class="flex w-full justify-end gap-1 text-right hover:opacity-75 sm:col-start-2"
+            href={`/posts/${nextLevel.slug}/`}
+            class="level-nav-card level-nav-next"
           >
-            <div>
-              <span>Siguiente articulo</span>
-              <div class="text-sm text-skin-accent/85">{nextPost.title}</div>
-            </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right flex-none"
-            >
-              <>
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 6l6 6l-6 6" />
-              </>
-            </svg>
+            <span class="pixel level-nav-label">
+              Next level {formatLevel(levelMap.get(nextLevel.slug) ?? 1)} &#9654;
+            </span>
+            <span class="level-nav-title">{nextLevel.data.title}</span>
           </a>
         )
       }
-    </div>
+    </nav>
   </main>
   <Footer />
 </Layout>
 
 <style>
   main {
-    @apply mx-auto w-full max-w-3xl px-4 pb-12;
+    @apply mx-auto w-full max-w-3xl px-4 pb-12 pt-8;
   }
   .post-title {
-    @apply text-2xl font-semibold text-skin-accent;
+    @apply font-display text-3xl font-bold uppercase leading-[0.95] tracking-tight sm:text-4xl;
+  }
+  .stage-tag {
+    @apply mb-3 text-[0.55rem] leading-none text-skin-accent opacity-80;
+  }
+
+  .level-hud {
+    @apply z-30 border-b-2 border-skin-line bg-skin-fill;
+  }
+  .exit-link {
+    @apply text-skin-base opacity-60 hover:text-skin-accent hover:opacity-100;
+  }
+
+  /* ===== Power-ups ===== */
+  .power-ups {
+    @apply mt-12 max-w-3xl px-0;
+  }
+  .power-ups-title {
+    @apply mb-3 text-[0.55rem] leading-none opacity-50;
+  }
+  .power-ups ul {
+    @apply flex flex-wrap gap-2;
+  }
+  .power-up {
+    @apply inline-block border-2 border-skin-line px-3 py-1.5 text-xs uppercase tracking-widest transition-colors hover:border-skin-accent hover:text-skin-accent;
+  }
+  .power-up::before {
+    content: "\002B";
+    @apply mr-1.5 text-skin-accent2;
+  }
+
+  /* ===== Fin de nivel ===== */
+  .level-complete {
+    @apply mt-12 max-w-3xl px-6 py-6;
+  }
+  .level-complete-title {
+    @apply text-sm leading-none;
+  }
+  .level-complete-lede {
+    @apply mt-3 text-sm opacity-70;
+  }
+  .level-complete-actions {
+    @apply mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  /* ===== Navegación entre niveles ===== */
+  .level-nav {
+    @apply mt-8 grid max-w-3xl grid-cols-1 gap-4 px-0 sm:grid-cols-2;
+  }
+  .level-nav-card {
+    @apply flex flex-col gap-2 border-2 border-skin-line p-4 transition-colors hover:border-skin-accent;
+  }
+  .level-nav-next {
+    @apply text-right sm:col-start-2;
+  }
+  .level-nav-label {
+    @apply text-[0.55rem] leading-none text-skin-accent;
+  }
+  .level-nav-title {
+    @apply text-sm opacity-80;
   }
 </style>
 
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
-  function createProgressBar() {
-    // Create the main container div
-    const progressContainer = document.createElement("div");
-    progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill";
-
-    // Create the progress bar div
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-skin-accent";
-    progressBar.id = "myBar";
-
-    // Append the progress bar to the progress container
-    progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
-    document.body.appendChild(progressContainer);
-  }
-  createProgressBar();
-
-  /** Update the progress bar
-   *  when user scrolls */
+  /** Barra de vida = progreso de lectura. El elemento ya existe en el HUD,
+   *  aquí sólo se le mueve el ancho. */
   function updateScrollProgress() {
-    document.addEventListener("scroll", () => {
-      const winScroll =
+    const bar = document.getElementById("level-bar-fill");
+    if (!bar) return;
+
+    const paint = () => {
+      const scrolled =
         document.body.scrollTop || document.documentElement.scrollTop;
       const height =
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
-      }
-    });
+      bar.style.width = height > 0 ? (scrolled / height) * 100 + "%" : "0%";
+    };
+
+    paint();
+    document.addEventListener("scroll", paint, { passive: true });
   }
   updateScrollProgress();
 
@@ -233,7 +273,7 @@ const nextPost =
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     const headings = Array.from(
-      document.querySelectorAll("h2, h3, h4, h5, h6")
+      document.querySelectorAll("#article h2, #article h3, #article h4, #article h5, #article h6")
     );
     for (const heading of headings) {
       heading.classList.add("group");
@@ -251,26 +291,43 @@ const nextPost =
   }
   addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
-  function attachCopyButtons() {
-    const copyButtonLabel = "Copy";
-    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+  /** Envuelve cada bloque de código en una "ventana" con barra de título,
+   * etiqueta de lenguaje y botón de copiar. */
+  function attachCodeChrome() {
+    const copyButtonLabel = "copiar";
+    const codeBlocks = Array.from(document.querySelectorAll("#article pre"));
 
     for (const codeBlock of codeBlocks) {
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
+      // El script se re-ejecuta en cada view transition: no envolver dos veces.
+      if (codeBlock.parentElement?.classList.contains("code-window")) continue;
+
+      const language = codeBlock.getAttribute("data-language") || "code";
+
+      const window_ = document.createElement("div");
+      window_.className = "code-window";
+
+      const bar = document.createElement("div");
+      bar.className = "code-bar";
+
+      const dots = document.createElement("span");
+      dots.className = "code-dots";
+      dots.setAttribute("aria-hidden", "true");
+      dots.innerHTML = "<i></i><i></i><i></i>";
+
+      const label = document.createElement("span");
+      label.className = "code-lang";
+      label.textContent = language;
 
       const copyButton = document.createElement("button");
-      copyButton.className =
-        "copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
-      copyButton.innerHTML = copyButtonLabel;
-      codeBlock.setAttribute("tabindex", "0");
-      codeBlock.appendChild(copyButton);
+      copyButton.type = "button";
+      copyButton.className = "copy-code";
+      copyButton.textContent = copyButtonLabel;
 
-      // wrap codebock with relative parent element
-      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
-      wrapper.appendChild(codeBlock);
+      bar.append(dots, label, copyButton);
+
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.parentNode?.insertBefore(window_, codeBlock);
+      window_.append(bar, codeBlock);
 
       copyButton.addEventListener("click", async () => {
         await copyCode(codeBlock, copyButton);
@@ -284,14 +341,14 @@ const nextPost =
       await navigator.clipboard.writeText(text ?? "");
 
       // visual feedback that task is completed
-      button.innerText = "Copied";
+      button.textContent = "copiado";
 
       setTimeout(() => {
-        button.innerText = copyButtonLabel;
+        button.textContent = copyButtonLabel;
       }, 700);
     }
   }
-  attachCopyButtons();
+  attachCodeChrome();
 
   /** Scrolls the document to the top when
    * the "Back to Top" button is clicked. */
