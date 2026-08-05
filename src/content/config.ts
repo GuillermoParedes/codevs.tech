@@ -22,6 +22,12 @@ const blog = defineCollection({
         .optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
+      /* Serie a la que pertenece el artículo. El nombre es la clave: dos
+         artículos con la misma cadena forman una serie. */
+      series: z.string().optional(),
+      /* Posición dentro de la serie, empezando en 1. Si falta, el artículo se
+         ordena por fecha detrás de los que sí la declaran. */
+      seriesOrder: z.number().int().positive().optional(),
     }),
 });
 

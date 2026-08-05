@@ -6,6 +6,8 @@ import Datetime from "@components/Datetime";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import ShareLinks from "@components/ShareLinks.astro";
+import SeriesNav from "@components/SeriesNav.astro";
+import { getSeriesForPost } from "@utils/getSeries";
 import {
   difficultyStars,
   formatLevel,
@@ -56,6 +58,10 @@ const layoutProps = {
 const levelMap = getLevelMap(posts);
 const meta = getLevelMeta(post, levelMap);
 
+/* La serie es navegación explícita entre artículos encadenados; convive con
+   prev/next de nivel, que sigue siendo cronológico y global. */
+const series = getSeriesForPost(post, posts);
+
 /* Anterior/siguiente van por número de nivel, no por fecha de modificación:
    si el HUD dice "LEVEL 03", "NEXT LEVEL" tiene que ser el 04. */
 const chronological = [...posts].sort(
@@ -89,7 +95,10 @@ const nextLevel =
           <span class="hud-label">World</span>
           {meta.world}
         </span>
-        <span class="text-skin-accent2" title={`Dificultad ${meta.difficulty} de 5`}>
+        <span
+          class="text-skin-accent2"
+          title={`Dificultad ${meta.difficulty} de 5`}
+        >
           {difficultyStars(meta.difficulty)}
         </span>
         <span class="ml-auto">
@@ -119,6 +128,9 @@ const nextLevel =
     <article id="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
+
+    <!-- ===== Serie ===== -->
+    {series && <SeriesNav series={series} currentSlug={post.slug} />}
 
     <!-- ===== Power-ups (etiquetas) ===== -->
     <section class="power-ups" aria-label="Etiquetas">
@@ -156,7 +168,8 @@ const nextLevel =
         prevLevel && (
           <a href={`/posts/${prevLevel.slug}/`} class="level-nav-card">
             <span class="pixel level-nav-label">
-              &#9664; Prev level {formatLevel(levelMap.get(prevLevel.slug) ?? 1)}
+              &#9664; Prev level{" "}
+              {formatLevel(levelMap.get(prevLevel.slug) ?? 1)}
             </span>
             <span class="level-nav-title">{prevLevel.data.title}</span>
           </a>
@@ -169,7 +182,8 @@ const nextLevel =
             class="level-nav-card level-nav-next"
           >
             <span class="pixel level-nav-label">
-              Next level {formatLevel(levelMap.get(nextLevel.slug) ?? 1)} &#9654;
+              Next level {formatLevel(levelMap.get(nextLevel.slug) ?? 1)}{" "}
+              &#9654;
             </span>
             <span class="level-nav-title">{nextLevel.data.title}</span>
           </a>
@@ -273,7 +287,9 @@ const nextLevel =
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     const headings = Array.from(
-      document.querySelectorAll("#article h2, #article h3, #article h4, #article h5, #article h6")
+      document.querySelectorAll(
+        "#article h2, #article h3, #article h4, #article h5, #article h6"
+      )
     );
     for (const heading of headings) {
       heading.classList.add("group");

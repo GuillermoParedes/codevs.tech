@@ -5,7 +5,7 @@ import LinkButton from "./LinkButton.astro";
 import getSortedPosts from "@utils/getSortedPosts";
 
 export interface Props {
-  activeNav?: "posts" | "tags" | "about" | "search";
+  activeNav?: "posts" | "series" | "tags" | "about" | "search";
 }
 
 const { activeNav } = Astro.props;
@@ -38,7 +38,8 @@ const levelCount = getSortedPosts(await getCollection("blog")).length;
 
       <p class="scoreboard" aria-hidden="true">
         <span class="score-item"
-          ><span class="score-label">1up</span> <span class="blink">&#9679;</span></span
+          ><span class="score-label">1up</span>
+          <span class="blink">&#9679;</span></span
         >
         <span class="score-item"
           ><span class="score-label">levels</span>
@@ -87,6 +88,14 @@ const levelCount = getSortedPosts(await getCollection("blog")).length;
           class:list={["nav-link", activeNav === "posts" && "active"]}
         >
           Articulos
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          href="/series/"
+          class:list={["nav-link", activeNav === "series" && "active"]}
+        >
+          Series
         </a>
       </li>
       <li class="nav-item">

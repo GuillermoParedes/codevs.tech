@@ -1,0 +1,112 @@
+---
+import { formatLevel } from "@utils/arcade";
+import type { Series } from "@utils/getSeries";
+
+export interface Props {
+  series: Series;
+  currentSlug: string;
+}
+
+const { series, currentSlug } = Astro.props;
+
+const currentIndex = series.posts.findIndex(post => post.slug === currentSlug);
+const next = currentIndex > -1 ? series.posts[currentIndex + 1] : undefined;
+const total = series.posts.length;
+---
+
+<section class="arcade-panel series-panel" aria-labelledby="series-title">
+  <p class="pixel series-eyebrow">Serie</p>
+  <h2 id="series-title" class="series-name">
+    <a href="/series/">{series.name}</a>
+  </h2>
+  <p class="series-progress">
+    Parte {formatLevel(currentIndex + 1)} de {formatLevel(total)}
+  </p>
+
+  <ol class="series-list">
+    {
+      series.posts.map((post, index) => {
+        const isCurrent = post.slug === currentSlug;
+        return (
+          <li class:list={["series-item", isCurrent && "is-current"]}>
+            <span class="pixel series-num" aria-hidden="true">
+              {formatLevel(index + 1)}
+            </span>
+            {isCurrent ? (
+              <span class="series-link" aria-current="true">
+                {post.data.title}
+                <span class="sr-only"> (estás aquí)</span>
+              </span>
+            ) : (
+              <a href={`/posts/${post.slug}/`} class="series-link">
+                {post.data.title}
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+
+  {
+    next && (
+      <a href={`/posts/${next.slug}/`} class="series-continue">
+        <span class="pixel">Continue &#9654;</span>
+        <span class="series-continue-title">{next.data.title}</span>
+      </a>
+    )
+  }
+</section>
+
+<style>
+  .series-panel {
+    @apply mt-12 max-w-3xl px-6 py-6;
+  }
+  .series-eyebrow {
+    @apply text-[0.55rem] leading-none text-skin-accent;
+  }
+  .series-name {
+    @apply mt-2 font-display text-lg font-bold uppercase leading-tight tracking-tight;
+  }
+  .series-name a:hover {
+    @apply text-skin-accent;
+  }
+  .series-progress {
+    @apply mt-1 text-xs uppercase tracking-widest opacity-50;
+  }
+
+  .series-list {
+    @apply mt-5 flex list-none flex-col gap-0 p-0;
+  }
+  .series-item {
+    @apply flex items-baseline gap-3 border-l-2 border-skin-line py-2 pl-4;
+  }
+  .series-item.is-current {
+    @apply border-skin-accent;
+  }
+  .series-num {
+    @apply flex-none text-[0.55rem] leading-none opacity-40;
+  }
+  .series-item.is-current .series-num {
+    @apply text-skin-accent opacity-100;
+  }
+  .series-link {
+    @apply text-sm opacity-70;
+  }
+  a.series-link:hover {
+    @apply text-skin-accent opacity-100;
+  }
+  .series-item.is-current .series-link {
+    @apply font-semibold opacity-100;
+  }
+
+  .series-continue {
+    @apply mt-6 flex flex-col gap-1 border-2 border-skin-line p-4 transition-colors hover:border-skin-accent;
+  }
+  .series-continue .pixel {
+    @apply text-[0.55rem] leading-none text-skin-accent;
+  }
+  .series-continue-title {
+    @apply text-sm opacity-80;
+  }
+</style>

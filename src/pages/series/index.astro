@@ -1,0 +1,123 @@
+---
+import { getCollection } from "astro:content";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import getSortedPosts from "@utils/getSortedPosts";
+import { getSeriesList } from "@utils/getSeries";
+import { formatLevel, getReadingMinutes } from "@utils/arcade";
+import { SITE } from "@config";
+
+const posts = getSortedPosts(await getCollection("blog"));
+const seriesList = getSeriesList(posts);
+
+const totalMinutes = (entries: (typeof posts)[number][]) =>
+  entries.reduce((sum, post) => sum + getReadingMinutes(post), 0);
+---
+
+<Layout
+  title={`Series | ${SITE.title}`}
+  description="Series de artículos de Codevs pensadas para leerse en orden, de principio a fin."
+>
+  <Header activeNav="series" />
+  <Main
+    eyebrow="Campaign select"
+    pageTitle="Series"
+    pageDesc="Artículos encadenados que se leen en orden. Empieza por la parte 01 y sigue el hilo."
+  >
+    {
+      seriesList.length === 0 && (
+        <p class="text-sm opacity-70">
+          Todavía no hay ninguna serie publicada.
+        </p>
+      )
+    }
+
+    <div class="series-stack">
+      {
+        seriesList.map(series => (
+          <section
+            class="arcade-panel series-card"
+            aria-labelledby={series.slug}
+          >
+            <p class="pixel series-meta">
+              {formatLevel(series.posts.length)}
+              {series.posts.length === 1 ? " parte" : " partes"} &middot;{" "}
+              {totalMinutes(series.posts)} min
+            </p>
+            <h2 id={series.slug} class="series-title">
+              <a href={`/posts/${series.posts[0].slug}/`}>{series.name}</a>
+            </h2>
+            <p class="series-desc">{series.posts[0].data.description}</p>
+
+            <ol class="series-parts">
+              {series.posts.map((post, index) => (
+                <li class="series-part">
+                  <span class="pixel series-part-num" aria-hidden="true">
+                    {formatLevel(index + 1)}
+                  </span>
+                  <a href={`/posts/${post.slug}/`} class="series-part-link">
+                    {post.data.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+
+            <a
+              href={`/posts/${series.posts[0].slug}/`}
+              class="pixel series-start"
+            >
+              Start &#9654;
+            </a>
+          </section>
+        ))
+      }
+    </div>
+  </Main>
+  <Footer />
+</Layout>
+
+<style>
+  .series-stack {
+    @apply flex flex-col gap-6;
+  }
+  .series-card {
+    @apply px-6 py-6;
+  }
+  .series-meta {
+    @apply text-[0.55rem] leading-none text-skin-accent2;
+  }
+  .series-title {
+    @apply mt-2 font-display text-xl font-bold uppercase leading-tight tracking-tight sm:text-2xl;
+  }
+  .series-title a:hover {
+    @apply text-skin-accent;
+  }
+  .series-desc {
+    @apply mt-3 text-sm opacity-70;
+  }
+
+  .series-parts {
+    @apply mt-5 flex list-none flex-col gap-0 p-0;
+  }
+  .series-part {
+    @apply flex items-baseline gap-3 border-l-2 border-skin-line py-2 pl-4;
+  }
+  .series-part:hover {
+    @apply border-skin-accent;
+  }
+  .series-part-num {
+    @apply flex-none text-[0.55rem] leading-none opacity-40;
+  }
+  .series-part-link {
+    @apply text-sm opacity-80;
+  }
+  .series-part-link:hover {
+    @apply text-skin-accent opacity-100;
+  }
+
+  .series-start {
+    @apply mt-5 inline-block border-2 border-skin-accent px-4 py-2 text-[0.55rem] leading-none text-skin-accent transition-colors hover:bg-skin-accent hover:text-skin-inverted;
+  }
+</style>
