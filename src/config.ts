@@ -4,7 +4,7 @@ export const SITE: Site = {
   website: "https://codevs.tech/", // replace this with your deployed domain
   author: "Codevs",
   profile: "https://codevs.tech/",
-  desc: "A blog from Codevs to coders and developers.",
+  desc: "Blog de Codevs sobre desarrollo frontend, Claude Code e IA aplicada al día a día de un ingeniero de software: React, Next.js, Angular, Docker y automatización.",
   title: "Codevs",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
@@ -43,5 +43,5 @@ export const SOCIALS: SocialObjects = [
     href: "mailto:hi.codevs@gmail.com",
     linkTitle: `Envia un email a ${SITE.title}`,
     active: true,
-  }
+  },
 ];

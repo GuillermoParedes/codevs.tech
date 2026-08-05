@@ -42,17 +42,6 @@ const ogUrl = new URL(
   Astro.url.origin
 ).href;
 
-const layoutProps = {
-  title: `${title} | ${SITE.title}`,
-  author,
-  description,
-  pubDatetime,
-  modDatetime,
-  canonicalURL,
-  ogImage: ogUrl,
-  scrollSmooth: true,
-};
-
 /* ========== Nivel ========== */
 
 const levelMap = getLevelMap(posts);
@@ -61,6 +50,54 @@ const meta = getLevelMeta(post, levelMap);
 /* La serie es navegación explícita entre artículos encadenados; convive con
    prev/next de nivel, que sigue siendo cronológico y global. */
 const series = getSeriesForPost(post, posts);
+
+/* ========== Datos estructurados ==========
+   El índice de la serie (`seriesOrder === 1`) declara además un ItemList con
+   las partes en orden: es la señal que le dice a Google que estas siete URLs
+   son un cuerpo único y cuál de ellas es la portada. Sólo lo emite el índice
+   para no repetir la misma lista siete veces. */
+const postURL = new URL(`/posts/${post.slug}/`, SITE.website).href;
+
+const seriesSchema =
+  series && post.data.seriesOrder === 1
+    ? [
+        {
+          "@type": "ItemList",
+          "@id": `${postURL}#series`,
+          name: series.name,
+          numberOfItems: series.posts.length,
+          itemListOrder: "https://schema.org/ItemListOrderAscending",
+          itemListElement: series.posts.map((entry, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: entry.data.title,
+            url: new URL(`/posts/${entry.slug}/`, SITE.website).href,
+          })),
+        },
+      ]
+    : [];
+
+const breadcrumbs = [
+  { name: "Inicio", url: new URL("/", SITE.website).href },
+  { name: "Artículos", url: new URL("/posts/", SITE.website).href },
+  { name: title, url: postURL },
+];
+
+const layoutProps = {
+  title: `${title} | ${SITE.title}`,
+  headline: title,
+  author,
+  description,
+  pubDatetime,
+  modDatetime,
+  canonicalURL,
+  ogImage: ogUrl,
+  scrollSmooth: true,
+  pageType: "article" as const,
+  tags,
+  breadcrumbs,
+  extraSchema: seriesSchema,
+};
 
 /* Anterior/siguiente van por número de nivel, no por fecha de modificación:
    si el HUD dice "LEVEL 03", "NEXT LEVEL" tiene que ser el 04. */

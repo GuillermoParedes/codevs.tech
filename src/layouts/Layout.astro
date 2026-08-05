@@ -1,5 +1,5 @@
 ---
-import { LOCALE, SITE } from "@config";
+import { LOCALE, SITE, SOCIALS } from "@config";
 import "@styles/base.css";
 import { ViewTransitions } from "astro:transitions";
 
@@ -15,6 +15,22 @@ export interface Props {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  /* Título limpio, sin el sufijo del sitio. `<title>` lleva "… | Codevs"
+     porque ayuda en la SERP, pero `headline` y las tarjetas sociales quieren
+     el título a secas. Por defecto cae a `title`. */
+  headline?: string;
+  /* `article` sólo en páginas de artículo. Cualquier otra página (home,
+     listados, /search, /404) es `website`: emitir BlogPosting en todas ellas
+     es schema inválido y Google descarta el bloque entero. */
+  pageType?: "article" | "website";
+  /* Palabras clave / temas del artículo — alimentan `keywords` y
+     `articleSection` del Article. */
+  tags?: string[];
+  /* Migas ya resueltas por la página: [{ name, url }] de raíz a hoja. */
+  breadcrumbs?: { name: string; url: string }[];
+  /* Nodos JSON-LD extra que aporta la página (ItemList de una serie,
+     FAQPage, etc.). Se añaden al @graph. */
+  extraSchema?: Record<string, unknown>[];
 }
 
 const {
@@ -27,6 +43,11 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  headline = title,
+  pageType = "website",
+  tags = [],
+  breadcrumbs = [],
+  extraSchema = [],
 } = Astro.props;
 
 const socialImageURL = new URL(
@@ -34,20 +55,97 @@ const socialImageURL = new URL(
   Astro.url.origin
 ).href;
 
+/* Identidades estables del sitio. Los `@id` con fragmento son lo que permite
+   a Google unir Person ↔ WebSite ↔ Article en una sola entidad en vez de
+   tratarlos como tres cosas sueltas. */
+const siteURL = new URL(SITE.website).href;
+const personId = `${siteURL}#person`;
+const siteId = `${siteURL}#website`;
+
+const person = {
+  "@type": "Person",
+  "@id": personId,
+  name: SITE.author,
+  url: profile,
+  jobTitle: "Ingeniero de software",
+  knowsAbout: [
+    "Desarrollo frontend",
+    "Claude Code",
+    "Inteligencia artificial aplicada al desarrollo",
+    "React",
+    "Next.js",
+    "Angular",
+    "TypeScript",
+    "Docker",
+  ],
+  sameAs: SOCIALS.filter(s => s.active && !s.href.startsWith("mailto:")).map(
+    s => s.href
+  ),
+  logo: {
+    "@type": "ImageObject",
+    url: new URL("/assets/logo.png", siteURL).href,
+  },
+};
+
+const website = {
+  "@type": "WebSite",
+  "@id": siteId,
+  url: siteURL,
+  name: SITE.title,
+  description: SITE.desc,
+  inLanguage: LOCALE.langTag?.[0] ?? "es-ES",
+  publisher: { "@id": personId },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${siteURL}search?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const article =
+  pageType === "article" && pubDatetime
+    ? {
+        "@type": "BlogPosting",
+        "@id": `${canonicalURL}#article`,
+        headline,
+        name: headline,
+        description,
+        image: socialImageURL,
+        inLanguage: LOCALE.langTag?.[0] ?? "es-ES",
+        datePublished: pubDatetime.toISOString(),
+        dateModified: (modDatetime ?? pubDatetime).toISOString(),
+        author: { "@id": personId },
+        publisher: { "@id": personId },
+        isPartOf: { "@id": siteId },
+        mainEntityOfPage: { "@type": "WebPage", "@id": canonicalURL },
+        ...(tags.length && {
+          keywords: tags.join(", "),
+          articleSection: tags[0],
+        }),
+      }
+    : null;
+
+const breadcrumbList = breadcrumbs.length
+  ? {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalURL}#breadcrumb`,
+      itemListElement: breadcrumbs.map((crumb, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: crumb.name,
+        item: crumb.url,
+      })),
+    }
+  : null;
+
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: `${title}`,
-  image: `${socialImageURL}`,
-  datePublished: `${pubDatetime?.toISOString()}`,
-  ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-  author: [
-    {
-      "@type": "Person",
-      name: `${author}`,
-      url: `${profile}`,
-    },
-  ],
+  "@graph": [person, website, article, breadcrumbList, ...extraSchema].filter(
+    Boolean
+  ),
 };
 ---
 
@@ -71,12 +169,30 @@ const structuredData = {
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:title" content={title} />
+    <meta property="og:type" content={pageType} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta
+      property="og:locale"
+      content={(LOCALE.langTag?.[0] ?? "es-ES").replace("-", "_")}
+    />
+    <meta property="og:title" content={headline} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={headline} />
 
     <!-- Article Published/Modified time -->
+    {
+      pageType === "article" &&
+        tags.map(tag => <meta property="article:tag" content={tag} />)
+    }
+    {
+      pageType === "article" && (
+        <meta property="article:author" content={SITE.author} />
+      )
+    }
     {
       pubDatetime && (
         <meta
@@ -97,7 +213,7 @@ const structuredData = {
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
+    <meta property="twitter:title" content={headline} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImageURL} />
 
