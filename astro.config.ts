@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
+import mdx from "@astrojs/mdx";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import sitemap from "@astrojs/sitemap";
@@ -17,6 +18,11 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     react(),
+    /* `mdx()` va DESPUÉS de todo lo que toque la config de markdown: hereda
+       `markdown.remarkPlugins` y `shikiConfig` de abajo (extendMarkdownConfig
+       por defecto), así que un .mdx sale con el mismo TOC y los mismos temas de
+       Shiki que un .md. Sólo se usa en artículos con demo embebida. */
+    mdx(),
     sitemap(),
   ],
 

@@ -4,7 +4,7 @@ import { defineCollection, z } from "astro:content";
 
 const blog = defineCollection({
   type: "content_layer",
-  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
   schema: ({ image }) =>
     z.object({
       author: z.string().default(SITE.author),
@@ -28,6 +28,10 @@ const blog = defineCollection({
       /* Posición dentro de la serie, empezando en 1. Si falta, el artículo se
          ordena por fecha detrás de los que sí la declaran. */
       seriesOrder: z.number().int().positive().optional(),
+      /* Clave que une las traducciones de un mismo artículo. El original no la
+         declara (se deriva de su slug); la traducción sí, apuntando al slug del
+         original. La consume `getTranslationKey` en `@utils/posts`. */
+      translationKey: z.string().optional(),
     }),
 });
 

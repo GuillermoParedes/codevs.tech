@@ -1,0 +1,127 @@
+---
+title: "La ventana de contexto: el recurso que pagas en cada turno"
+author: Codevs
+pubDatetime: 2026-08-11T09:00:00Z
+slug: ventana-de-contexto
+featured: false
+draft: false
+tags:
+  - Contexto
+  - IA
+  - Claude Code
+  - Config
+description: "Qué hay dentro de la ventana de contexto de un agente, por qué se llena antes de lo que crees y cómo medir lo que estás pagando en cada turno."
+series: "Contexto y memoria en agentes de código"
+seriesOrder: 2
+---
+
+import ContextBudget from "@components/ContextBudget";
+
+Un modelo de lenguaje no tiene estado. Esta frase parece técnica y aburrida, y en realidad es la explicación de casi todo lo raro que hace tu agente.
+
+Cuando escribes el turno número cuarenta de una sesión, no estás continuando una conversación: estás enviando **los cuarenta turnos completos otra vez**, junto con el prompt de sistema, las descripciones de todas las herramientas, tu `CLAUDE.md` y cada archivo que se leyó por el camino. El modelo lee ese bloque entero, produce una respuesta, y lo olvida. En el turno cuarenta y uno vuelves a mandarlo todo, más lo nuevo.
+
+Eso es la ventana de contexto: no una memoria, sino **un presupuesto de tokens que se gasta entero en cada petición**.
+
+## Table of contents
+
+## Qué hay realmente dentro
+
+La gente imagina que su contexto es "la conversación". La conversación suele ser la minoría. Este es el reparto típico de una sesión de trabajo real:
+
+| Pieza                        | Qué es                                                           | Se puede tocar |
+| ---------------------------- | ---------------------------------------------------------------- | -------------- |
+| Prompt de sistema            | Instrucciones del agente                                         | No             |
+| Definiciones de herramientas | El esquema de `Read`, `Bash`, `Grep`…                            | Poco           |
+| Herramientas de MCP          | Un servidor conectado son sus herramientas **siempre presentes** | Sí, mucho      |
+| `CLAUDE.md` / `AGENTS.md`    | Tus convenciones, cargadas al arrancar                           | Sí             |
+| Archivos leídos              | Íntegros, no fragmentos                                          | Sí             |
+| Salida de herramientas       | Builds, tests, logs, páginas web                                 | Sí, muchísimo  |
+| Conversación                 | Lo que se dijeron                                                | Sí             |
+
+Juega con el reparto. Enciende un par de servidores MCP y mira qué pasa con el espacio libre:
+
+<ContextBudget client:visible />
+
+Lo que suele sorprender la primera vez son dos cosas. La primera: **la configuración cuesta**. Tres servidores MCP conectados pueden ocupar más que toda tu conversación, y están ahí aunque no llames a ninguna de sus herramientas — lo que viaja son las descripciones, no las llamadas. La segunda: **la basura no se recicla**. Esa salida de build fallido que miraste una vez sigue ocupando su espacio hasta que la sesión termine o alguien la borre.
+
+## Por qué se llena antes de lo que crees
+
+Hay tres multiplicadores que la intuición no captura.
+
+**Los archivos se leen enteros.** Un agente no lee "la función que necesita": lee el archivo. Un componente React de 600 líneas ronda los 6.000 tokens, y una sesión que toca cinco archivos ya lleva 30.000 antes de escribir una línea.
+
+**La salida de herramientas se infla.** Una traza de error de TypeScript, un `git log`, la respuesta de una API, una página de documentación convertida a markdown. Todo eso entra tal cual. Es el material con peor relación señal/ruido de la ventana: enorme, útil durante treinta segundos, permanente.
+
+**El historial crece de forma cuadrática en costo.** Cada turno reenvía lo anterior. Si tu sesión llega a 400.000 tokens de contexto y aún te quedan veinte turnos, no estás pagando 400.000 tokens: estás pagando algo cercano a ocho millones. Con Opus 5 a 5 dólares por millón de tokens de entrada, eso son unos 40 dólares de una conversación que "no hizo nada".
+
+## El problema que no arregla una ventana más grande
+
+Hoy hay modelos de un millón de tokens de contexto —Opus 5, Sonnet 5— y suites de agentes que anuncian dos millones. La reacción natural es pensar que el problema está resuelto. No lo está, por dos motivos independientes.
+
+**El primero es el costo**, que acabamos de ver: la ventana grande no abarata nada, solo te deja gastar más antes de chocar.
+
+**El segundo es la atención.** Un modelo no atiende igual a todo lo que tiene delante. La información al principio y al final de la ventana pesa más que la del medio; en cuanto la ventana se llena de material de relleno, lo importante compite con lo irrelevante por la misma atención. En la práctica: una instrucción que diste en el turno tres, enterrada bajo 200.000 tokens de salida de tests, deja de comportarse como una instrucción.
+
+Esto es lo que se popularizó como **context rot**, y es la razón por la que "cabe" y "funciona" son dos cosas distintas. Un contexto medio vacío y bien elegido rinde mejor que uno lleno hasta arriba. El 70% de ocupación no es un límite duro, pero es un buen punto para empezar a desconfiar de la sesión.
+
+## Qué pasa cuando se llena
+
+Cuando el presupuesto se agota, los agentes no fallan: **compactan**. Resumen la conversación anterior en un bloque mucho más corto y siguen con ese resumen en lugar del original.
+
+Funciona sorprendentemente bien y, aun así, es una pérdida. El resumen conserva el "qué" y pierde el "por qué": recuerda que eligieron Zustand, no que descartaron Redux porque el equipo ya tenía tres formas de gestionar estado. Tras dos o tres compactaciones seguidas, el agente se comporta como si la sesión acabara de empezar — con la diferencia de que cree que sabe cosas.
+
+Cada agente compacta a su manera y esa comparación es el [siguiente artículo](/posts/contexto-claude-codex-antigravity). Lo que importa aquí es el principio: **la compactación es el mecanismo de emergencia, no la estrategia**. Si tu flujo de trabajo depende de compactar tres veces por sesión, el problema está aguas arriba.
+
+## Medir en vez de suponer
+
+Todo lo anterior es inútil si no miras los números de tu propia sesión. Tres formas, de la más barata a la más precisa.
+
+**Dentro de Claude Code**, `/context` te da el desglose por categorías —cuánto ocupa el prompt de sistema, las herramientas MCP, tus archivos— y el buffer que reserva para autocompactar. Es el primer lugar donde mirar, y casi nadie lo mira.
+
+**Contra la API**, el endpoint de conteo de tokens. Cuidado con un error muy extendido: **no uses `tiktoken`**. Es el tokenizador de OpenAI y subestima los tokens de Claude entre un 15% y un 20% en texto normal, y bastante más en código.
+
+```typescript
+const { input_tokens } = await client.messages.countTokens({
+  model: "claude-opus-5",
+  messages: [{ role: "user", content: await readFile("CLAUDE.md", "utf8") }],
+});
+
+console.log(`CLAUDE.md cuesta ${input_tokens} tokens en cada turno`);
+```
+
+**En la respuesta**, el bloque `usage`. Aquí está el dato que más gente interpreta mal:
+
+```typescript
+const total =
+  response.usage.input_tokens + // procesado a precio completo
+  response.usage.cache_creation_input_tokens + // escrito en caché (~1,25x)
+  response.usage.cache_read_input_tokens; // leído de caché (~0,1x)
+```
+
+Si tu agente lleva una hora trabajando y `input_tokens` marca 4.000, no es que el contexto sea pequeño: es que casi todo se sirvió desde caché. **El tamaño real del prompt es la suma de los tres campos**, no el primero.
+
+## La caché cambia la aritmética, no la estrategia
+
+La caché de prompt es el descuento más grande disponible y funciona con una regla única: **es una coincidencia de prefijo**. El prompt se renderiza en el orden `herramientas → sistema → mensajes`, y cualquier byte que cambie invalida todo lo que venga después.
+
+De ahí salen dos consecuencias prácticas, y las dos se incumplen constantemente:
+
+- **Un `datetime.now()` en el prompt de sistema tira la caché entera, cada petición.** Lo mismo con un UUID, un `JSON.stringify` de claves desordenadas o un conjunto de herramientas que varía por usuario.
+- **Cambiar de herramientas o de modelo a mitad de sesión** invalida todo: las herramientas se renderizan en la posición cero.
+
+Leer de caché cuesta en torno a una décima parte del precio de entrada; escribirla, un 25% más que procesar normal (o el doble si pides una hora de vida). La verificación es de una línea: si `cache_read_input_tokens` es cero en peticiones repetidas con el mismo prefijo, tienes un invalidador silencioso.
+
+Que quede claro qué resuelve esto y qué no: **la caché abarata el contexto, no lo mejora**. Un contexto lleno de ruido cacheado sigue siendo un contexto lleno de ruido; simplemente pagas menos por confundir al modelo.
+
+## Lo siguiente
+
+Ya sabes qué hay dentro de la ventana, por qué se llena y cómo medirlo. Falta lo que cada herramienta hace cuando se llena — y ahí Claude Code, Codex y Antigravity toman decisiones muy distintas, con consecuencias distintas para tu trabajo.
+
+Eso es el [siguiente artículo de la serie](/posts/contexto-claude-codex-antigravity).
+
+Y si quieres ver cómo esto se aplica a un caso concreto de configuración, los [subagentes de Claude Code](/posts/claude-code-subagentes) son el ejemplo más directo de "delegar cuando quieres la conclusión pero no el material".
+
+---
+
+Parte de la serie [Contexto y memoria en agentes de código](/posts/contexto-memoria-agentes). Si tu equipo está pagando facturas de agente que nadie auditó, [cuéntame el caso](mailto:hi.codevs@gmail.com) o mira [en qué trabajo](/about).
