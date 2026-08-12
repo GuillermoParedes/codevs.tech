@@ -9,8 +9,7 @@ tags:
   - Config
   - Builds
   - Custom-builds
-description:
-  "En proyectos Angular, es común que surja la necesidad de generar versiones específicas de la aplicación para diferentes clientes, marcas o instancias. Un ejemplo común es cambiar logos o temas de color, sin alterar el código base. En esta guía paso a paso, aprenderás cómo realizar builds personalizados, reemplazando logos y estilos según la instancia que estés construyendo."
+description: "En proyectos Angular, es común que surja la necesidad de generar versiones específicas de la aplicación para diferentes clientes, marcas o instancias. Un ejemplo común es cambiar logos o temas de color, sin alterar el código base. En esta guía paso a paso, aprenderás cómo realizar builds personalizados, reemplazando logos y estilos según la instancia que estés construyendo."
 ---
 
 > Este es un articulo original de [blog post](https://codevs.tech/blog/posts/guide-angular-custom-builds). En proyectos Angular, es común que surja la necesidad de generar versiones específicas de la aplicación para diferentes clientes.
@@ -19,11 +18,11 @@ Si trabajas en proyectos que requieren distintas versiones visuales o funcionale
 
 Esta guía asume que ya tienes una aplicación Angular instalada y funcionando localmente.
 
-### Paso 1: Configurar los Entornos en ```angular.json```
+### Paso 1: Configurar los Entornos en `angular.json`
 
 Lo primero que haremos será definir las configuraciones de build para las distintas versiones de nuestra aplicación (por ejemplo, versiones en diferentes idiomas o para diferentes marcas).
 
-#### 1.1 Modificar ```angular.json```
+#### 1.1 Modificar `angular.json`
 
 Abre el archivo angular.json y localiza la propiedad projects/architect/build/configurations. Aquí es donde podemos definir nuestras configuraciones personalizadas para los builds de Angular.
 

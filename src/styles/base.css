@@ -449,8 +449,7 @@
   }
   .joystick-ball {
     @apply absolute -top-6 left-1/2 block h-10 w-10 -translate-x-1/2 rounded-full border-2 border-skin-line;
-    background:
-      radial-gradient(
+    background: radial-gradient(
         circle at 34% 28%,
         rgba(255, 255, 255, 0.5),
         transparent 46%

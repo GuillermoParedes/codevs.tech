@@ -7,8 +7,7 @@ featured: false
 tags:
   - NextJS
   - TypeScript
-description:
-  "Exploraremos los conceptos basicos de NextJS 15, para el manejo de rutas y el renderizado"
+description: "Exploraremos los conceptos basicos de NextJS 15, para el manejo de rutas y el renderizado"
 ---
 
 ## 1. Introducción a Next.js 15 y su Enrutamiento
@@ -129,19 +128,19 @@ Creación del Middleware: En la raíz del proyecto, crea un archivo middleware.t
 
 ```typescript
 // middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth_token');
+  const token = request.cookies.get("auth_token");
 
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 }
 
 export const config = {
-  matcher: ['/blog/:path*'],
+  matcher: ["/blog/:path*"],
 };
 ```
 

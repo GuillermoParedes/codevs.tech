@@ -9,8 +9,7 @@ tags:
   - Dockerfile
   - React
   - Frontend
-description:
-  "En el desarrollo moderno, Docker se ha convertido en una herramienta indispensable para crear entornos de desarrollo consistentes y reproducibles."
+description: "En el desarrollo moderno, Docker se ha convertido en una herramienta indispensable para crear entornos de desarrollo consistentes y reproducibles."
 ---
 
 > Este es un articulo original de [blog post](https://codevs.tech/blog/posts/docker-frontends-dev). En el desarrollo moderno, Docker se ha convertido en una herramienta indispensable para crear entornos de desarrollo consistentes y reproducibles.
@@ -78,10 +77,10 @@ CMD ["nginx", "-g", "daemon off;"]
 #### Explicación del Dockerfile:
 
 - Etapa 1: Build
-Utilizamos la imagen oficial de Node.js para instalar las dependencias y compilar la aplicación. Esto nos asegura que tengamos un entorno idéntico en todas las máquinas.
+  Utilizamos la imagen oficial de Node.js para instalar las dependencias y compilar la aplicación. Esto nos asegura que tengamos un entorno idéntico en todas las máquinas.
 
 - Etapa 2: Producción
-Usamos una imagen ligera de Nginx para servir la aplicación en producción. Esta etapa solo incluye los archivos necesarios para ejecutar la aplicación, lo que reduce el tamaño del contenedor final.
+  Usamos una imagen ligera de Nginx para servir la aplicación en producción. Esta etapa solo incluye los archivos necesarios para ejecutar la aplicación, lo que reduce el tamaño del contenedor final.
 
 ## 3. Crear un archivo .dockerignore
 
@@ -157,7 +156,7 @@ Este archivo configura:
 
 - Volúmenes: Sincroniza los archivos locales con los del contenedor, permitiendo que los cambios en el código se reflejen inmediatamente.
 - CHOKIDAR_USEPOLLING: Asegura que el hot-reloading funcione correctamente en algunos sistemas.
-Para ejecutar este entorno de desarrollo, usa:
+  Para ejecutar este entorno de desarrollo, usa:
 
 ```bash
 docker-compose up
@@ -172,7 +171,7 @@ El uso de Docker no solo simplifica la configuración de entornos de desarrollo,
 - Configuración rápida y sencilla: Solo necesitas clonar el repositorio, ejecutar Docker y empezar a trabajar sin preocuparte por las dependencias locales.
 - Entorno unificado: Todos los miembros del equipo usan el mismo entorno, eliminando inconsistencias.
 - Aislamiento de proyectos: Al usar contenedores, puedes evitar conflictos entre dependencias de diferentes proyectos.
-Facilita CI/CD: Docker se integra perfectamente con herramientas de CI/CD, permitiendo pruebas y despliegues automáticos en cualquier entorno.
+  Facilita CI/CD: Docker se integra perfectamente con herramientas de CI/CD, permitiendo pruebas y despliegues automáticos en cualquier entorno.
 
 ## Conclusión
 

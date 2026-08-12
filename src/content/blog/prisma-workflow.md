@@ -9,10 +9,8 @@ tags:
   - Database
   - MySql
   - PostgreSql
-description:
-  "En este artículo exploraremos cómo usar Prisma para gestionar bases de datos de manera eficiente con MySQL y PostgreSQL."
+description: "En este artículo exploraremos cómo usar Prisma para gestionar bases de datos de manera eficiente con MySQL y PostgreSQL."
 ---
-
 
 En este artículo, exploraremos cómo usar Prisma para gestionar bases de datos de manera eficiente con MySQL y PostgreSQL. Desde la creación del esquema hasta el manejo de migraciones en entornos de producción, este tutorial cubre cada paso con ejemplos claros y concisos. Además, hablaremos sobre cómo gestionar vistas en Prisma y las diferencias clave entre MySQL y PostgreSQL. ¡Ideal para desarrolladores que buscan optimizar el trabajo con bases de datos relacionales usando Prisma!
 
@@ -203,7 +201,7 @@ CREATE TABLE `Comment` (
 Si decides editar el archivo migration.sql manualmente, asegúrate de seguir estos pasos:
 
 - Pruebas: Aplica los cambios en un entorno de prueba antes de hacerlo en producción.
-Sincronización con el schema: Asegúrate de que el archivo schema.prisma refleje los cambios.
+  Sincronización con el schema: Asegúrate de que el archivo schema.prisma refleje los cambios.
 
 Por ejemplo, si cambias la longitud de una columna name de 255 a 100 caracteres:
 
@@ -222,7 +220,6 @@ ALTER TABLE `User` ADD COLUMN `name` VARCHAR(100);
 > Nota: En algunos casos, puede ser necesario realizar ediciones manuales al archivo migration.sql. Esto suele aplicarse cuando necesitamos insertar datos específicos que son esenciales para la configuración inicial del sistema o para mantener la consistencia durante el desarrollo. Por ejemplo, la inserción de registros en tablas relacionadas con catálogos, países o ciudades, que son fundamentales desde el inicio del sistema o en etapas intermedias de desarrollo.
 
 Es importante tener en cuenta que, si bien Prisma gestiona automáticamente las migraciones, las ediciones manuales pueden ser útiles para personalizar scripts que, por motivos del negocio o requisitos del cliente, no pueden ser generados automáticamente. Cuando se edita el migration.sql manualmente, es esencial hacerlo con cuidado, asegurando que las modificaciones sean compatibles con el esquema y la integridad de la base de datos.
-
 
 ## 6. Hacer rollback de una migración específica
 
@@ -253,8 +250,3 @@ Evita ediciones manuales en producción. Prueba los cambios en desarrollo o stag
 ## Conclusión
 
 Prisma simplifica la gestión de esquemas y migraciones. Siguiendo estos pasos, podrás eliminar campos, cambiar tipos de datos o agregar tablas nuevas con facilidad. Sin embargo, recuerda tener precauciones adicionales al trabajar en producción y probar siempre los cambios en un entorno seguro.
-
-
-
-
-

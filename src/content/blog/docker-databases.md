@@ -10,8 +10,7 @@ tags:
   - MySql
   - PostgreSql
   - Adminer
-description:
-  "El uso de contenedores ha transformado el desarrollo de aplicaciones al ofrecer entornos reproducibles y fáciles de configurar."
+description: "El uso de contenedores ha transformado el desarrollo de aplicaciones al ofrecer entornos reproducibles y fáciles de configurar."
 ---
 
 El uso de contenedores ha transformado el desarrollo de aplicaciones al ofrecer entornos reproducibles y fáciles de configurar. Docker es una herramienta clave para implementar rápidamente bases de datos y herramientas de administración como Adminer y PHPMyAdmin. Este artículo describe cómo configurar un entorno con PostgreSQL, MariaDB, Adminer, y opcionalmente, PHPMyAdmin usando docker-compose.
@@ -27,7 +26,6 @@ En este ejemplo, configuramos PostgreSQL, MariaDB y dos herramientas para la adm
 El siguiente es el archivo docker-compose.yml, que define los contenedores para las bases de datos y sus herramientas de administración.
 
 ```yaml
-
 version: "3"
 
 services:
@@ -36,18 +34,18 @@ services:
     image: postgres:16
     restart: always
     volumes:
-      - ./pgdata:/var/lib/postgresql/data  
+      - ./pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: root         
-      POSTGRES_PASSWORD: sample 
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: sample
     ports:
-      - "5432:5432"                 
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U root"]
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   mysql:
     container_name: "MYSQL-DB"
     image: mariadb:latest
@@ -79,16 +77,16 @@ services:
 #### Servicios configurados
 
 - PostgreSQL: Base de datos relacional que utiliza un volumen para persistir los datos.
-            Se expone en el puerto 5432.
-            Incluye una verificación de salud (healthcheck) que se ejecuta cada 10 segundos.
+  Se expone en el puerto 5432.
+  Incluye una verificación de salud (healthcheck) que se ejecuta cada 10 segundos.
 
 - MariaDB: Base de datos relacional similar a MySQL.
-        Volúmenes utilizados para persistencia y otros datos.
-        Se expone en el puerto 3306.
+  Volúmenes utilizados para persistencia y otros datos.
+  Se expone en el puerto 3306.
 
 - Adminer: Herramienta ligera para la administración de bases de datos.
-        Se expone en el puerto 8080.
-        Administra tanto MariaDB como PostgreSQL.
+  Se expone en el puerto 8080.
+  Administra tanto MariaDB como PostgreSQL.
 
 Utiliza un archivo de configuración personalizado y un volumen para persistir los datos.
 
@@ -105,18 +103,18 @@ Adminer: Esta herramienta permite gestionar las bases de datos desde una interfa
 PHPMyAdmin (opcional): Si necesitas usar PHPMyAdmin para gestionar MariaDB, puedes descomentar el servicio correspondiente. PHPMyAdmin se configurará para conectarse a MariaDB y estará disponible en el puerto 8081. Lo utilizo para poder generar el diagrama de la base de datos.
 
 ```yaml
-    phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: pma
-    depends_on:
-        - db
-    environment:
-        PMA_HOST: db
-        PMA_PORT: 3306
-        PMA_ARBITRARY: 1
-    restart: always
-    ports:
-        - 8081:80
+phpmyadmin:
+image: phpmyadmin/phpmyadmin
+container_name: pma
+depends_on:
+  - db
+environment:
+  PMA_HOST: db
+  PMA_PORT: 3306
+  PMA_ARBITRARY: 1
+restart: always
+ports:
+  - 8081:80
 ```
 
 ### 5. Conclusión

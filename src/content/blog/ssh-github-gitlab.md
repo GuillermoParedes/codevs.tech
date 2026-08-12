@@ -7,8 +7,7 @@ featured: false
 tags:
   - Github
   - SSH
-description:
-  "Como crear llaves para nuestro entorno de trabajo para clientes GIT"
+description: "Como crear llaves para nuestro entorno de trabajo para clientes GIT"
 ---
 
 > Este es un articulo original de [blog post](https://codevs.tech/blog/posts/ssh-github-gitlab). Como crear llaves SSH para nuestro entorno de trabajo con clientes GIT.
@@ -77,6 +76,7 @@ Las extensiones .pub indican las llaves públicas que compartirás con GitHub o 
 Si tienes varias cuentas, como una en GitHub y otra en GitLab, puedes configurarlas fácilmente para que funcionen simultáneamente.
 
 #### 3.1 Crear el archivo config
+
 Crea un archivo de configuración en el directorio .ssh:
 
 ```bash
@@ -176,6 +176,7 @@ Si todo está bien configurado, recibirás un mensaje que te da la bienvenida al
 ```
 
 ### Paso 7: Configuración para Servidores Privados o GitLab Empresarial
+
 Si trabajas en una compañía que tiene su propio servidor GitLab o un dominio personalizado, puedes agregarlo a tu archivo config de la siguiente manera:
 
 ```bash

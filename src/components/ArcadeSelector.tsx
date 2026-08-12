@@ -92,8 +92,7 @@ export default function ArcadeSelector({
       if (dir === "left" || dir === "right") {
         next = (current + (dir === "right" ? 1 : -1) + total) % total;
       } else {
-        const candidate =
-          current + (dir === "down" ? 1 : -1) * colsRef.current;
+        const candidate = current + (dir === "down" ? 1 : -1) * colsRef.current;
         // Fuera de rango: no hay fila a la que ir, se deja pasar el gesto.
         if (candidate < 0 || candidate >= total) return false;
         next = candidate;
