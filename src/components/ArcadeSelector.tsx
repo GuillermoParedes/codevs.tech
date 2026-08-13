@@ -280,7 +280,7 @@ export default function ArcadeSelector({
             <span className="opacity-50">{active.level.minutes} min</span>
           </p>
 
-          <p className="font-display mt-3 truncate text-lg font-bold uppercase leading-tight tracking-tight">
+          <p className="mt-3 truncate font-display text-lg font-bold uppercase leading-tight tracking-tight">
             {active.frontmatter.title}
           </p>
           <p className="mt-1 line-clamp-2 text-sm opacity-70">

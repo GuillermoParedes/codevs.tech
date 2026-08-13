@@ -39,6 +39,17 @@ const contactHref =
   <div class="footer-wrapper">
     <Socials centered />
     <p class="pixel copyright">
+      <!-- El isotipo `[}` en naranja de marca. Va decorativo: el nombre
+           ya está escrito al lado, así que repetirlo en el `alt` sólo
+           duplicaría la lectura del lector de pantalla. -->
+      <img
+        class="copyright-mark"
+        src="/assets/brand/isotipo-bracket.svg"
+        alt=""
+        aria-hidden="true"
+        width="14"
+        height="14"
+      />
       <span>&copy; {currentYear} Codevs</span>
       <span class="opacity-40">&middot; 1 player</span>
     </p>
@@ -74,5 +85,8 @@ const contactHref =
   }
   .copyright {
     @apply flex flex-wrap items-center justify-center gap-2 text-[0.5rem] leading-loose opacity-70;
+  }
+  .copyright-mark {
+    @apply h-3.5 w-auto;
   }
 </style>

@@ -1,87 +1,99 @@
 import satori from "satori";
 import { SITE } from "@config";
 import loadGoogleFonts, { type FontOptions } from "../loadGoogleFont";
+import { BRAND, LOGO_DATA_URI, logoSize } from "./brand";
 
+/* Tarjeta social por defecto (home, listados, /search, /404). El lockup manda
+   y la descripción acompaña: aquí lo que se comparte es la marca, no un
+   artículo concreto. */
 export default async () => {
+  const logo = logoSize(520);
+  const domain = new URL(SITE.website).hostname;
+
   return satori(
     <div
       style={{
-        background: "#fefbfb",
         width: "100%",
         height: "100%",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        background: BRAND.black,
+        padding: 28,
+        fontFamily: "IBM Plex Mono",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          top: "-1px",
-          right: "-1px",
-          border: "4px solid #000",
-          background: "#ecebeb",
-          opacity: "0.9",
-          borderRadius: "4px",
           display: "flex",
-          justifyContent: "center",
-          margin: "2.5rem",
-          width: "88%",
-          height: "80%",
-        }}
-      />
-
-      <div
-        style={{
-          border: "4px solid #000",
-          background: "#fefbfb",
-          borderRadius: "4px",
-          display: "flex",
-          justifyContent: "center",
-          margin: "2rem",
-          width: "88%",
-          height: "80%",
+          flexDirection: "column",
+          width: "100%",
+          height: "100%",
+          background: BRAND.screen,
+          border: `2px solid ${BRAND.line}`,
         }}
       >
+        {/* En flujo y no en absoluto: ver la nota en `post.tsx`. */}
+        <div
+          style={{
+            display: "flex",
+            height: 8,
+            flexShrink: 0,
+            background: BRAND.orange,
+          }}
+        />
+
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            margin: "20px",
-            width: "90%",
-            height: "90%",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            padding: "56px 72px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "90%",
-              maxHeight: "90%",
-              overflow: "hidden",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ fontSize: 72, fontWeight: "bold" }}>{SITE.title}</p>
-            <p style={{ fontSize: 28 }}>{SITE.desc}</p>
-          </div>
+          <img
+            src={LOGO_DATA_URI}
+            width={logo.width}
+            height={logo.height}
+            alt={SITE.title}
+          />
 
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
-              width: "100%",
-              marginBottom: "8px",
-              fontSize: 28,
+              marginTop: 30,
+              width: 120,
+              height: 6,
+              background: BRAND.orange,
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              marginTop: 30,
+              maxWidth: 880,
+              fontSize: 26,
+              lineHeight: 1.45,
+              textAlign: "center",
+              color: BRAND.white,
             }}
           >
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-              {new URL(SITE.website).hostname}
-            </span>
+            {SITE.desc}
           </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            paddingBottom: 34,
+            fontSize: 22,
+            letterSpacing: 4,
+            color: BRAND.peach,
+          }}
+        >
+          {domain.toUpperCase()}
         </div>
       </div>
     </div>,
@@ -90,7 +102,7 @@ export default async () => {
       height: 630,
       embedFont: true,
       fonts: (await loadGoogleFonts(
-        SITE.title + SITE.desc + SITE.website
+        SITE.title + SITE.desc + domain + domain.toUpperCase()
       )) as FontOptions[],
     }
   );

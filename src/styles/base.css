@@ -2,21 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===================================================================
+   PALETA DE MARCA
+   Todos los valores salen del manual de Codevs (`src/assets/Style-Guide.jpg`):
+   naranja #FF6602, gris #737372, claros #FFCBAE/#E0E0E0 y la escala de grises
+   #F2F2F2 → #333333. La única excepción es `--color-neon`, que no es un color
+   de marca sino un color funcional de alerta (ver su nota más abajo).
+   =================================================================== */
 @layer base {
   :root,
   html[data-theme="light"] {
-    --color-fill: 250, 250, 249;
-    --color-text-base: 24, 24, 27;
-    --color-accent: 0, 118, 88;
-    --color-accent-2: 186, 66, 8;
-    --color-card: 240, 240, 237;
-    --color-card-muted: 224, 224, 220;
-    --color-border: 218, 218, 213;
+    --color-fill: 242, 242, 242; /* #F2F2F2 */
+    --color-text-base: 26, 26, 26; /* #1A1A1A */
+    /* El naranja de marca sobre fondo claro sólo alcanza 2.6:1. Para texto y
+       enlaces se usa una versión oscurecida que sí pasa AA (4.9:1); el naranja
+       puro se reserva para el logo y para superficies, donde no aplica. */
+    --color-accent: 179, 71, 0; /* #B34700 */
+    --color-accent-2: 102, 102, 102; /* #666666 */
+    --color-card: 224, 224, 224; /* #E0E0E0 */
+    --color-card-muted: 204, 204, 204; /* #CCCCCC */
+    --color-border: 153, 153, 153; /* #999999 */
 
-    /* Gabinete: el plástico que rodea la pantalla y el tercer acento neón. */
-    --color-cab: 202, 199, 191;
-    --color-cab-line: 166, 163, 154;
-    --color-neon: 197, 24, 118;
+    /* Gabinete: el plástico que rodea la pantalla. */
+    --color-cab: 204, 204, 204; /* #CCCCCC */
+    --color-cab-line: 115, 115, 114; /* #737372 — gris de marca */
+    /* Color funcional de alerta (desbordes, avisos). Fuera de la paleta a
+       propósito: en rojo se lee como peligro, en naranja se confundiría con
+       el acento de marca. */
+    --color-neon: 194, 42, 20; /* #C22A14 */
     /* Intensidad de los efectos de tubo. En claro casi no se notan a propósito:
        las scanlines sobre fondo blanco destruyen la legibilidad del texto. */
     --crt-scanline: 0.06;
@@ -24,17 +37,17 @@
     --crt-glow: 0.16;
   }
   html[data-theme="dark"] {
-    --color-fill: 11, 14, 20;
-    --color-text-base: 226, 232, 240;
-    --color-accent: 0, 229, 160;
-    --color-accent-2: 255, 145, 80;
-    --color-card: 20, 25, 34;
-    --color-card-muted: 31, 38, 51;
-    --color-border: 38, 47, 63;
+    --color-fill: 26, 26, 26; /* #1A1A1A */
+    --color-text-base: 242, 242, 242; /* #F2F2F2 */
+    --color-accent: 255, 102, 2; /* #FF6602 — naranja de marca */
+    --color-accent-2: 255, 203, 174; /* #FFCBAE — claro del manual */
+    --color-card: 38, 38, 38; /* #262626 */
+    --color-card-muted: 51, 51, 51; /* #333333 */
+    --color-border: 77, 77, 77; /* #4D4D4D */
 
-    --color-cab: 6, 8, 12;
-    --color-cab-line: 44, 54, 72;
-    --color-neon: 255, 62, 166;
+    --color-cab: 13, 13, 13; /* #0D0D0D */
+    --color-cab-line: 115, 115, 114; /* #737372 — gris de marca */
+    --color-neon: 255, 71, 52; /* #FF4734 */
     --crt-scanline: 0.26;
     --crt-vignette: 0.55;
     --crt-glow: 0.5;
@@ -185,10 +198,10 @@
   }
 
   /* ===== Tipografía display =====
-     Es la misma IBM Plex Mono en peso alto, versalitas y tracking cerrado.
-     Da el golpe visual de una display sin una segunda petición de fuente. */
+     Quicksand Bold, la display del manual de marca. En versalitas y tracking
+     cerrado enlaza visualmente con el logotipo sin repetirlo. */
   .display {
-    @apply font-display font-bold uppercase leading-[0.92] tracking-tight;
+    @apply font-display font-bold uppercase leading-[0.95] tracking-tight;
   }
 
   /* ===== Ventana de código =====
@@ -279,7 +292,11 @@
   /* ===== Tipografía de píxeles =====
      Press Start 2P sólo para el "chrome" de la máquina (LEVEL 03, PRESS
      START, créditos, nav). Nunca para títulos de artículo ni para prosa:
-     a partir de ~4 palabras se vuelve ilegible y desborda en móvil. */
+     a partir de ~4 palabras se vuelve ilegible y desborda en móvil.
+
+     Y nunca con tildes ni eñes: la fuente no trae esos glifos, así que cada
+     uno cae al mono de respaldo y parte la palabra en dos tipografías. Es la
+     razón de que el chrome diga "ARTICULOS" y "BUSQUEDA" sin acento. */
   .pixel {
     font-family: "Press Start 2P", "IBM Plex Mono", monospace;
     @apply uppercase leading-loose tracking-normal;

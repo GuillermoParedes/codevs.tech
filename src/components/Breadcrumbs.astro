@@ -6,10 +6,27 @@ const currentUrlPath = Astro.url.pathname.replace(/\/+$/, "");
 // eg: /tags/tailwindcss => ['tags', 'tailwindcss']
 const breadcrumbList = currentUrlPath.split("/").slice(1);
 
+/* Rótulos en español para los segmentos fijos de la URL: la ruta va en inglés
+   pero la interfaz no. Van SIN tilde a propósito — la miga se compone en Press
+   Start 2P y esa fuente no trae glifos acentuados (ver `.pixel` en base.css).
+   Sólo afecta al texto: los `href` siguen usando el segmento crudo. */
+const LABELS: Record<string, string> = {
+  posts: "Articulos",
+  tags: "Etiquetas",
+  search: "Busqueda",
+  about: "Sobre mi",
+};
+
+const label = (segment: string) => LABELS[segment] ?? segment;
+
 // if breadcrumb is Home > Posts > 1 <etc>
 // replace Posts with Posts (page number)
 breadcrumbList[0] === "posts" &&
-  breadcrumbList.splice(0, 2, `Posts (page ${breadcrumbList[1] || 1})`);
+  breadcrumbList.splice(
+    0,
+    2,
+    `${LABELS.posts} (pagina ${breadcrumbList[1] || 1})`
+  );
 
 // if breadcrumb is Home > Tags > [tag] > [page] <etc>
 // replace [tag] > [page] with [tag] (page number)
@@ -19,7 +36,9 @@ breadcrumbList[0] === "tags" &&
     1,
     3,
     `${breadcrumbList[1]} ${
-      Number(breadcrumbList[2]) === 1 ? "" : "(page " + breadcrumbList[2] + ")"
+      Number(breadcrumbList[2]) === 1
+        ? ""
+        : "(pagina " + breadcrumbList[2] + ")"
     }`
   );
 ---
@@ -27,7 +46,7 @@ breadcrumbList[0] === "tags" &&
 <nav class="breadcrumb pixel" aria-label="breadcrumb">
   <ul>
     <li>
-      <a href="/">Home</a>
+      <a href="/">Inicio</a>
       <span aria-hidden="true">&rsaquo;</span>
     </li>
     {
@@ -39,12 +58,12 @@ breadcrumbList[0] === "tags" &&
               aria-current="page"
             >
               {/* make the last part lowercase in Home > Tags > some-tag */}
-              {decodeURIComponent(breadcrumb)}
+              {label(decodeURIComponent(breadcrumb))}
             </span>
           </li>
         ) : (
           <li>
-            <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
+            <a href={`/${breadcrumb}/`}>{label(breadcrumb)}</a>
             <span aria-hidden="true">&rsaquo;</span>
           </li>
         )

@@ -66,7 +66,9 @@ module.exports = {
       },
       fontFamily: {
         mono: ["IBM Plex Mono", "monospace"],
-        display: ["IBM Plex Mono", "monospace"],
+        // Quicksand Bold es la display del manual de marca: la misma geométrica
+        // redondeada del logotipo "codevs". Sólo para titulares.
+        display: ["Quicksand", "IBM Plex Mono", "monospace"],
         // Sólo para el chrome de la máquina. Ver la nota en `.pixel`.
         pixel: ["Press Start 2P", "IBM Plex Mono", "monospace"],
       },

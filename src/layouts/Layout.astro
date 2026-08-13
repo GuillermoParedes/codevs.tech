@@ -157,7 +157,13 @@ const structuredData = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <!-- El SVG es el isotipo `[}` en naranja de marca: es lo único del logo
+         que sigue siendo legible a 16px. El .ico queda de respaldo para los
+         navegadores que aún no leen favicons vectoriales. -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
@@ -226,11 +232,13 @@ const structuredData = {
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Press Start 2P viaja en la MISMA petición que IBM Plex Mono: dos
-         familias en un solo `css2?family=…&family=…` no cuestan un RTT extra.
-         Sólo se usa para el chrome del gabinete (ver `.pixel` en base.css). -->
+    <!-- Las tres familias viajan en la MISMA petición: varias en un solo
+         `css2?family=…&family=…` no cuestan un RTT extra.
+         · IBM Plex Mono — cuerpo y código.
+         · Quicksand 700 — display del manual de marca, sólo titulares.
+         · Press Start 2P — chrome del gabinete (ver `.pixel` en base.css). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Press+Start+2P&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Quicksand:wght@700&family=Press+Start+2P&display=swap"
       rel="preload"
       as="style"
       onload="this.onload=null; this.rel='stylesheet';"
@@ -241,12 +249,12 @@ const structuredData = {
          pantalla: es lo que toca el borde del viewport. -->
     <meta
       name="theme-color"
-      content="#cac7bf"
+      content="#cccccc"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#06080c"
+      content="#0d0d0d"
       media="(prefers-color-scheme: dark)"
     />
 

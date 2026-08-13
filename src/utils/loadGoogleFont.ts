@@ -43,6 +43,9 @@ async function loadGoogleFonts(
 ): Promise<
   Array<{ name: string; data: ArrayBuffer; weight: number; style: string }>
 > {
+  /* Las mismas familias que carga el sitio: IBM Plex Mono para el cuerpo y
+     Quicksand 700 como display de marca. Los nombres tienen que coincidir con
+     el `fontFamily` que usan las plantillas OG. */
   const fontsConfig = [
     {
       name: "IBM Plex Mono",
@@ -55,6 +58,12 @@ async function loadGoogleFonts(
       font: "IBM+Plex+Mono:wght@700",
       weight: 700,
       style: "bold",
+    },
+    {
+      name: "Quicksand",
+      font: "Quicksand:wght@700",
+      weight: 700,
+      style: "normal",
     },
   ];
 

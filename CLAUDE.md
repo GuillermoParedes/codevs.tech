@@ -123,15 +123,29 @@ Reglas de contenido:
   `/search` y `/404`. Es un defecto de SEO conocido y pendiente (ver roadmap).
 - Las fuentes se cargan desde Google Fonts por red en `Layout.astro` — coste de LCP pendiente de
   resolver con self-hosting.
-- La identidad visual es propia (paleta verde/ámbar sobre azul-negro, display en IBM Plex Mono
-  pesada y en versalitas, ventana de terminal en los bloques de código). No es AstroPaper de fábrica:
-  antes de "arreglar" un estilo que parezca raro, mira `.display`, `.code-window` y `.prompt` en
-  `src/styles/base.css`.
-- **MDX no está instalado.** Para artículos con componentes interactivos embebidos hay que añadir
-  `@astrojs/mdx` primero.
+- La identidad visual es propia y sale del **manual de marca** (`src/assets/Style-Guide.jpg`):
+  naranja `#FF6602` y gris `#737372` sobre `#1A1A1A` / `#F2F2F2`, con `#FFCBAE` como claro de apoyo.
+  Encima va una capa de arcade: gabinete CRT, scanlines, IBM Plex Mono en cuerpo y código,
+  Quicksand Bold sólo en titulares (`.display`) y Press Start 2P sólo en el chrome (`.pixel`).
+  No es AstroPaper de fábrica: antes de "arreglar" un estilo que parezca raro, mira `.display`,
+  `.code-window` y `.prompt` en `src/styles/base.css`.
+- El naranja de marca **sólo se usa tal cual en modo oscuro**. Sobre el fondo claro llega a 2.6:1,
+  así que `--color-accent` en light es `#B34700` (4.9:1). El `#FF6602` puro queda para el logo y
+  para superficies, donde el contraste de texto no aplica.
+- `--color-neon` (`#C22A14` / `#FF4734`) **no es un color de marca**: es el rojo funcional de aviso
+  que usa `ContextBudget.tsx` para los desbordes. En naranja se confundiría con el acento.
+- **MDX ya está instalado** (`@astrojs/mdx`, registrado en `astro.config.ts` después de la config de
+  markdown para heredar TOC y temas de Shiki). Úsalo sólo en artículos con demo embebida.
 - No hay tests ni Lighthouse en CI.
-- `public/` guarda el CV en PDF y assets de marca; `astropaper-og.jpg` sigue siendo el OG por defecto
-  del tema, no de Codevs.
+- Los assets de marca **derivados** viven en `public/assets/brand/` (lockups horizontal y apilado en
+  sus cuatro versiones, isotipo, iconos PWA y el `logo-og.png` que incrustan las tarjetas OG). Los
+  originales del manual están en `src/assets/Logo-Codevs-*`. Ojo: **los nombres de origen están
+  cruzados** — los archivos `*-Horizontal-*` contienen el lockup apilado y los `*-Vertical-*` el
+  horizontal. En `public/assets/brand/` ya están renombrados a lo que de verdad son.
+- Las tarjetas OG se generan con Satori y **no leen las variables CSS**: la paleta está duplicada a
+  mano en `src/utils/og-templates/brand.ts`. Si cambias `base.css`, cambia también ese archivo.
+  Ese módulo resuelve el logo contra `process.cwd()` y no contra `import.meta.url` — al empaquetar
+  acaba en `dist/chunks/` y cualquier ruta relativa al módulo se sale de la raíz del proyecto.
 
 ## Skills del proyecto
 

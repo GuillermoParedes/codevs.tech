@@ -6,7 +6,9 @@ export const SITE: Site = {
   profile: "https://codevs.tech/",
   desc: "Blog de Codevs sobre desarrollo frontend, Claude Code e IA aplicada al día a día de un ingeniero de software: React, Next.js, Angular, Docker y automatización.",
   title: "Codevs",
-  ogImage: "astropaper-og.jpg",
+  /* Tarjeta generada por `src/pages/og.png.ts` con la marca de Codevs. Antes
+     apuntaba al `astropaper-og.jpg` de fábrica del tema. */
+  ogImage: "og.png",
   lightAndDarkMode: true,
   postPerIndex: 4,
   postPerPage: 3,
@@ -18,11 +20,14 @@ export const LOCALE = {
   langTag: ["es-ES"], // BCP 47 Language Tags. Set this empty [] to use the environment default
 } as const;
 
+/* Lockup horizontal del manual de marca (viewBox 1091×212 → ratio 5.15).
+   Las dos variantes (color sobre claro, 2white sobre oscuro) las conmuta el
+   CSS de Header.astro, no este objeto. */
 export const LOGO_IMAGE = {
-  enable: false,
+  enable: true,
   svg: true,
-  width: 216,
-  height: 46,
+  width: 175,
+  height: 34,
 };
 
 export const SOCIALS: SocialObjects = [

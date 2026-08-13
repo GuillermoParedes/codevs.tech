@@ -21,15 +21,29 @@ const levelCount = getSortedPosts(await getCollection("blog")).length;
   <!-- ===== Marquesina ===== -->
   <div class="marquee">
     <div class="marquee-inner">
-      <a href="/" class="logo whitespace-nowrap">
+      <a href="/" class="logo whitespace-nowrap" aria-label={SITE.title}>
         {
           LOGO_IMAGE.enable ? (
-            <img
-              src={`/assets/${LOGO_IMAGE.svg ? "logo.svg" : "logo.png"}`}
-              alt={SITE.title}
-              width={LOGO_IMAGE.width}
-              height={LOGO_IMAGE.height}
-            />
+            <Fragment>
+              {/* Dos archivos y no un `filter: invert()`: el lockup es
+                  bicolor y cualquier inversión destruiría el naranja. El
+                  `alt` va sólo en uno para no duplicar el nombre accesible,
+                  que ya lo aporta el `aria-label` del enlace. */}
+              <img
+                class="logo-img logo-light"
+                src="/assets/brand/logo-horizontal-color.svg"
+                alt=""
+                width={LOGO_IMAGE.width}
+                height={LOGO_IMAGE.height}
+              />
+              <img
+                class="logo-img logo-dark"
+                src="/assets/brand/logo-horizontal-2white.svg"
+                alt=""
+                width={LOGO_IMAGE.width}
+                height={LOGO_IMAGE.height}
+              />
+            </Fragment>
           ) : (
             <span class="brand neon">{SITE.title.toLowerCase()}</span>
           )
@@ -170,7 +184,17 @@ const levelCount = getSortedPosts(await getCollection("blog")).length;
     @apply mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 sm:py-4;
   }
   .logo {
-    @apply py-1 text-xl font-semibold sm:text-2xl;
+    @apply flex items-center py-1 text-xl font-semibold sm:text-2xl;
+  }
+  .logo-img {
+    @apply h-7 w-auto sm:h-8;
+  }
+  .logo-dark,
+  html[data-theme="dark"] .logo-light {
+    @apply hidden;
+  }
+  html[data-theme="dark"] .logo-dark {
+    @apply block;
   }
   /* Los corchetes van en CSS y no en el markup: así no dependen del
      espaciado que prettier reintroduce, y el nombre accesible del enlace

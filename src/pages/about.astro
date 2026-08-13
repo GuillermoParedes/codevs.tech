@@ -1,0 +1,301 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import Main from "@layouts/Main.astro";
+import Socials from "@components/Socials.astro";
+import { SITE } from "@config";
+
+const title = "Sobre mí";
+const description =
+  "Guillermo Paredes, ingeniero de software en La Paz. Sistemas judiciales, sociales y financieros con Angular, React, NestJS y Docker.";
+
+const pageURL = new URL("/about/", SITE.website).href;
+
+/* El primer trabajo del CV es de 2018. Calcularlo en cada build evita que la
+   cifra envejezca sola, que es lo que le pasó al "más de 5 años" anterior. */
+const CAREER_START = 2018;
+const years = new Date().getFullYear() - CAREER_START;
+
+/* Marcador del HUD: los mismos cuatro datos que cualquiera busca antes de
+   escribir un correo.
+
+   Sin tildes ni eñes: el marcador va en Press Start 2P y esa fuente no trae
+   los glifos acentuados, así que cada uno cae a IBM Plex Mono y rompe la
+   línea a media palabra. Por eso "Desde 2018" y no "Años 8" — y de paso el
+   dato no envejece. */
+const stats = [
+  { label: "Rol", value: "Tech Lead" },
+  { label: "Desde", value: `${CAREER_START}` },
+  { label: "Equipo", value: "4" },
+  { label: "Base", value: "La Paz, BO" },
+];
+
+const stack = [
+  {
+    label: "Front",
+    items: ["Angular", "React", "Next.js", "Astro", "Flutter"],
+  },
+  { label: "Back", items: ["NestJS", "Node.js", "Prisma", "LoopBack"] },
+  { label: "Datos", items: ["PostgreSQL", "MySQL", "SQLite"] },
+  { label: "Infra", items: ["Docker", "Vercel", "TypeScript"] },
+];
+
+/* Proyectos reales, no capacidades genéricas: es lo único que separa un
+   "sobre mí" de una carta de presentación. */
+const projects = [
+  {
+    name: "Sicamex",
+    where: "Poder Judicial de Durango · México",
+    what: "Gestión de expedientes de adolescentes en conflicto con la ley penal. Me tocó el backend, el diseño de la base de datos y los flujos administrativos que exigía la normativa judicial.",
+    stack: ["Angular", "NestJS", "TypeScript", "MySQL", "Docker"],
+  },
+  {
+    name: "Tahaddi",
+    where: "Personas refugiadas · Líbano",
+    what: "Seguimiento de servicios médicos, educativos y sociales. Llevé el módulo social: registro de casos, gestión de datos y los reportes con los que se decide a dónde va la ayuda.",
+    stack: ["Angular", "Ionic", "SQLite", "LoopBack"],
+  },
+  {
+    name: "Formación judicial LGBTI",
+    where: "Órgano Judicial · Bolivia",
+    what: "Aplicación de escritorio para formar al sistema judicial en los derechos de las comunidades LGBTI. El reto no era la lógica: era que el contenido fuese accesible y corriera en equipos muy dispares.",
+    stack: ["React", "Electron", "SQLite", "TypeScript"],
+  },
+  {
+    name: "Livainn",
+    where: "Plataforma Yape",
+    what: "Captura de datos en tiempo real para quienes se suscriben a la plataforma, con importación y exportación hacia el banco para su posterior análisis.",
+    stack: ["Next.js", "NestJS", "Prisma", "MySQL"],
+  },
+];
+
+const breadcrumbs = [
+  { name: "Inicio", url: new URL("/", SITE.website).href },
+  { name: title, url: pageURL },
+];
+
+/* `ProfilePage` cuelga del `Person` que ya emite el Layout en todas las
+   páginas: no duplica la entidad, la señala como la página que la describe. */
+const extraSchema = [
+  {
+    "@type": "ProfilePage",
+    "@id": `${pageURL}#profile`,
+    url: pageURL,
+    name: title,
+    description,
+    inLanguage: "es-ES",
+    mainEntity: { "@id": `${new URL(SITE.website).href}#person` },
+    isPartOf: { "@id": `${new URL(SITE.website).href}#website` },
+  },
+];
+---
+
+<Layout
+  title={`${title} | ${SITE.title}`}
+  headline={title}
+  description={description}
+  breadcrumbs={breadcrumbs}
+  extraSchema={extraSchema}
+>
+  <Header activeNav="about" />
+
+  <Main eyebrow="Player 1" pageTitle={title}>
+    <section id="about">
+      <p class="lede">
+        Soy <strong>Guillermo Paredes</strong>, ingeniero de software en La Paz,
+        Bolivia. Llevo {years} años construyendo sistemas que otra gente usa para
+        trabajar: expedientes judiciales, seguimiento de casos sociales, gestión
+        de créditos. Hoy lidero un equipo de cuatro personas en Fondation Tutator,
+        donde sigo tocando frontend, backend y despliegue.
+      </p>
+
+      <!-- ===== Marcador ===== -->
+      <dl class="hud stats" aria-label="Resumen profesional">
+        {
+          stats.map(stat => (
+            <div class="stat">
+              <dt class="hud-label">{stat.label}</dt>
+              <dd class="stat-value">{stat.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <!-- ===== Historial ===== -->
+      <h2 class="display section-title">Partidas jugadas</h2>
+      <p class="section-lede">
+        Una selección. Casi todo lo que he construido lo opera alguien que no
+        eligió usarlo —un juez, una trabajadora social, un asesor de créditos— y
+        eso ordena las prioridades de una manera muy concreta.
+      </p>
+
+      <ul class="project-grid">
+        {
+          projects.map(project => (
+            <li class="level-tile project">
+              <p class="project-where">{project.where}</p>
+              <h3 class="display project-name">{project.name}</h3>
+              <p class="project-what">{project.what}</p>
+              <p class="project-stack">{project.stack.join(" · ")}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="section-note">
+        También: el sistema de evaluación para el ingreso a la carrera notarial
+        de DIRNOPLU, gestión de créditos multiplataforma con modo offline para
+        una entidad financiera en Yotta Software, y sincronización de bases de
+        datos en la nube y en local para el Servicio Departamental de Salud.
+      </p>
+
+      <!-- ===== Stack ===== -->
+      <h2 class="display section-title">Herramientas</h2>
+      <dl class="stack">
+        {
+          stack.map(group => (
+            <div class="stack-row">
+              <dt class="pixel stack-label">{group.label}</dt>
+              <dd class="stack-items">{group.items.join(" · ")}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <!-- ===== Método ===== -->
+      <h2 class="display section-title">Cómo trabajo</h2>
+      <ul class="method">
+        <li>
+          <strong>El producto manda sobre el stack.</strong> Primero que el flujo
+          real funcione para quien lo usa ocho horas al día; después, la elegancia
+          técnica.
+        </li>
+        <li>
+          <strong>Equipos chicos, roles cruzados.</strong> Lidero, pero no delego
+          lo que no sabría arreglar yo mismo a las dos de la mañana.
+        </li>
+        <li>
+          <strong>El contexto se escribe.</strong> Lo que no está documentado se
+          vuelve a descubrir en cada iteración, y desde que trabajo con agentes de
+          código eso cuesta el doble. De ahí sale casi todo lo que publico en
+          <a href="/tags/claude-code/">este blog</a>.
+        </li>
+      </ul>
+
+      <!-- ===== Formación ===== -->
+      <h2 class="display section-title">Formación</h2>
+      <p class="formation">
+        Licenciatura en Informática por la Universidad Mayor de San Andrés
+        (2011–2017). Actualmente curso una maestría en Educación Superior en la
+        misma universidad.
+      </p>
+
+      <!-- ===== Contacto =====
+           Sin CTA propia: la ranura de monedas del footer ya es la llamada a
+           la acción del sitio y va justo debajo. Aquí sólo van los enlaces de
+           utilidad que alguien busca en un "sobre mí". -->
+      <div class="contact">
+        <a
+          class="arcade-btn arcade-btn-b"
+          href="/cv-guillermo_paredes_torrez.pdf"
+        >
+          Descargar CV
+        </a>
+        <Socials />
+      </div>
+    </section>
+  </Main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* El ancho, el padding y el título los pone `Main`. */
+  #about {
+    @apply pb-16;
+  }
+
+  .lede {
+    @apply mt-6 text-lg leading-relaxed opacity-90;
+  }
+
+  /* ===== Marcador ===== */
+  .stats {
+    @apply mt-8 justify-between gap-y-3;
+  }
+  .stat {
+    @apply flex items-baseline gap-2;
+  }
+  .stat-value {
+    @apply m-0 text-skin-accent;
+  }
+
+  /* ===== Secciones ===== */
+  .section-title {
+    @apply mt-14 text-xl sm:text-2xl;
+  }
+  .section-lede {
+    @apply mt-3 opacity-80;
+  }
+  .section-note {
+    @apply mt-5 text-sm opacity-70;
+  }
+
+  /* ===== Historial ===== */
+  .project-grid {
+    @apply mt-6 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2;
+  }
+  .project {
+    @apply gap-2;
+  }
+  .project-where {
+    @apply text-[0.65rem] uppercase tracking-[0.15em] text-skin-accent2;
+  }
+  .project-name {
+    @apply text-lg;
+  }
+  .project-what {
+    @apply flex-1 text-sm leading-relaxed opacity-80;
+  }
+  .project-stack {
+    @apply border-t-2 border-skin-line pt-2 text-xs opacity-60;
+  }
+
+  /* ===== Stack ===== */
+  .stack {
+    @apply mt-6 flex flex-col gap-3;
+  }
+  .stack-row {
+    @apply flex flex-col gap-1 border-l-2 border-skin-line pl-4 sm:flex-row sm:items-baseline sm:gap-4;
+  }
+  .stack-label {
+    @apply flex-none text-[0.55rem] text-skin-accent sm:w-16;
+  }
+  .stack-items {
+    @apply m-0 opacity-80;
+  }
+
+  /* ===== Método ===== */
+  .method {
+    @apply mt-6 flex list-none flex-col gap-4 p-0;
+  }
+  .method li {
+    @apply border-l-2 border-skin-line pl-4 leading-relaxed opacity-90;
+  }
+  .method strong {
+    @apply block text-skin-accent;
+  }
+  .method a {
+    @apply text-skin-accent underline decoration-dashed underline-offset-4;
+  }
+
+  .formation {
+    @apply mt-4 opacity-80;
+  }
+
+  /* ===== Contacto ===== */
+  .contact {
+    @apply mt-12 flex flex-wrap items-center gap-x-6 gap-y-4 border-t-2 border-skin-line pt-8;
+  }
+</style>
