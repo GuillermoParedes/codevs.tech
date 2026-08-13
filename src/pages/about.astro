@@ -8,7 +8,7 @@ import { SITE } from "@config";
 
 const title = "Sobre mí";
 const description =
-  "Guillermo Paredes, ingeniero de software en La Paz. Sistemas judiciales, sociales y financieros con Angular, React, NestJS y Docker.";
+  "Guillermo Paredes, ingeniero de software en La Paz. Sistemas judiciales, sociales y financieros con Angular, React, NestJS y agentes de código.";
 
 const pageURL = new URL("/about/", SITE.website).href;
 
@@ -31,14 +31,21 @@ const stats = [
   { label: "Base", value: "La Paz, BO" },
 ];
 
+/* El orden dentro de cada fila no es alfabético: va de lo que más he
+   entregado a lo que menos. Quien lee un stack asume esa jerarquía aunque no
+   se la digan. */
 const stack = [
   {
     label: "Front",
-    items: ["Angular", "React", "Next.js", "Astro", "Flutter"],
+    items: ["Angular", "React", "Next.js", "React Native", "Astro", "Flutter"],
   },
-  { label: "Back", items: ["NestJS", "Node.js", "Prisma", "LoopBack"] },
+  {
+    label: "Back",
+    items: ["NestJS", "Node.js", "Prisma", "LoopBack", "Python", "FastAPI"],
+  },
   { label: "Datos", items: ["PostgreSQL", "MySQL", "SQLite"] },
   { label: "Infra", items: ["Docker", "Vercel", "TypeScript"] },
+  { label: "Agentes", items: ["Claude Code", "Agent SDK", "Antigravity"] },
 ];
 
 /* Proyectos reales, no capacidades genéricas: es lo único que separa un
@@ -176,10 +183,17 @@ const extraSchema = [
           lo que no sabría arreglar yo mismo a las dos de la mañana.
         </li>
         <li>
-          <strong>El contexto se escribe.</strong> Lo que no está documentado se
-          vuelve a descubrir en cada iteración, y desde que trabajo con agentes de
-          código eso cuesta el doble. De ahí sale casi todo lo que publico en
-          <a href="/tags/claude-code/">este blog</a>.
+          <strong>El diseño va antes que el código.</strong> Lo que tiene peso arranca
+          en un documento de diseño: qué problema resuelve, qué toca y qué deja fuera.
+          Con agentes de código eso dejó de ser burocracia — es exactamente el contexto
+          que Claude Code o
+          <a href="/posts/contexto-claude-codex-antigravity/">Antigravity</a>
+          necesitan para no volver a decidir en cada iteración lo que ya estaba decidido.
+        </li>
+        <li>
+          <strong>Lo que aprendo, lo publico.</strong> Casi todo lo que hay en
+          <a href="/tags/claude-code/">este blog</a> sale de problemas que me encontré
+          trabajando, no de leer documentación.
         </li>
       </ul>
 
